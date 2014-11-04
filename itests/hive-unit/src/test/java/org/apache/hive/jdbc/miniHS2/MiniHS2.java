@@ -54,6 +54,7 @@ public class MiniHS2 extends AbstractHiveService {
   private static final AtomicLong hs2Counter = new AtomicLong();
   private static final String HS2_BINARY_MODE = "binary";
   private static final String HS2_HTTP_MODE = "http";
+  private static final String HS2_RDMA_MODE = "rdma";
   private MiniMrShim mr;
   private MiniDFSShim dfs;
 

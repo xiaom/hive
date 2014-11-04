@@ -41,6 +41,21 @@ public class TestHiveServer2 {
   private static MiniHS2 miniHS2 = null;
   private Map<String, String> confOverlay;
 
+  /**
+   * NOTES:
+   *
+   * http://stackoverflow.com/questions/20295578/difference-between-before-and-beforeclass
+   *
+   * The code marked @Before is executed before each test,
+   * while @BeforeClass runs once before the entire test fixture.
+   * If your test class has ten tests, @Before code will be executed ten times,
+   * but @BeforeClass will be executed only once.
+   *
+   * In general, you use @BeforeClass when multiple tests need to share the same
+   * computationally expensive setup code. Establishing a database connection
+   * falls into this category.
+   * You can move code from @BeforeClass into @Before, but your test run may take longer.
+   */
   @BeforeClass
   public static void beforeTest() throws IOException {
     miniHS2 = new MiniHS2(new HiveConf());

@@ -32,6 +32,7 @@ import org.apache.hive.service.cli.CLIService;
 import org.apache.hive.service.cli.thrift.ThriftBinaryCLIService;
 import org.apache.hive.service.cli.thrift.ThriftCLIService;
 import org.apache.hive.service.cli.thrift.ThriftHttpCLIService;
+import org.apache.hive.service.cli.thrift.ThriftRDMACLIService;
 
 /**
  * HiveServer2.
@@ -60,7 +61,10 @@ public class HiveServer2 extends CompositeService {
     if(transportMode != null && (transportMode.equalsIgnoreCase("http"))) {
       thriftCLIService = new ThriftHttpCLIService(cliService);
     }
-    else {
+    else if(transportMode.equalsIgnoreCase("RDMA")) {
+      thriftCLIService = new ThriftRDMACLIService(cliService);
+    }
+    else{
       thriftCLIService = new ThriftBinaryCLIService(cliService);
     }
 
@@ -142,7 +146,7 @@ public class HiveServer2 extends CompositeService {
       // before any of the other core hive classes are loaded
       String initLog4jMessage = LogUtils.initHiveLog4j();
       LOG.debug(initLog4jMessage);
-      
+
       HiveStringUtils.startupShutdownMessage(HiveServer2.class, args, LOG);
       //log debug message from "oproc" after log4j initialize properly
       LOG.debug(oproc.getDebugMessage().toString());
