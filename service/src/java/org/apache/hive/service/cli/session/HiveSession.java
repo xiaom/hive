@@ -29,6 +29,10 @@ public interface HiveSession extends HiveSessionBase {
 
   void open(Map<String, String> sessionConfMap) throws Exception;
 
+  public String getData(String key);
+  
+  public void setData(String key, String value);
+  
   IMetaStoreClient getMetaStoreClient() throws HiveSQLException;
 
   /**

@@ -62,6 +62,42 @@ public class Column extends AbstractList {
   private List<String> stringVars;
   private List<ByteBuffer> binaryVars;
 
+  public boolean[] getBools() {
+    return boolVars;
+  }
+
+  public byte[] getBytes() {
+    return byteVars;
+  }
+
+  public short[] getShorts() {
+    return shortVars;
+  }
+
+  public int[] getInts() {
+    return intVars;
+  }
+
+  public long[] getLongs() {
+    return longVars;
+  }
+
+  public double[] getDoubles() {
+    return doubleVars;
+  }
+
+  public List<String> getStrings() {
+    return stringVars;
+  }
+
+  public List<ByteBuffer> getBinaries() {
+    return binaryVars;
+  }
+
+  public ByteBuffer getNulls() {
+    return ByteBuffer.wrap(toBinary(nulls));
+  }
+
   public Column(Type type, BitSet nulls, Object values) {
     this.type = type;
     this.nulls = nulls;
@@ -247,7 +283,7 @@ public class Column extends AbstractList {
     return bitset;
   }
 
-  private static byte[] toBinary(BitSet bitset) {
+  public static byte[] toBinary(BitSet bitset) {
     byte[] nulls = new byte[1 + (bitset.length() / 8)];
     for (int i = 0; i < bitset.length(); i++) {
       nulls[i / 8] |= bitset.get(i) ? MASKS[i % 8] : 0;

@@ -42,6 +42,7 @@ import org.apache.hive.service.cli.RowSet;
 import org.apache.hive.service.cli.RowSetFactory;
 import org.apache.hive.service.cli.TableSchema;
 import org.apache.hive.service.cli.session.HiveSession;
+import org.mortbay.log.Log;
 
 /**
  * Executes a HiveCommand
@@ -66,7 +67,7 @@ public class HiveCommandOperation extends ExecuteStatementOperation {
 
   private void setupSessionIO(SessionState sessionState) {
     try {
-      LOG.info("Putting temp output to file " + sessionState.getTmpOutputFile().toString());
+      //LOG.info("Putting temp output to file " + sessionState.getTmpOutputFile().toString());
       sessionState.in = null; // hive server's session input stream is not used
       // open a per-session file in auto-flush mode for writing temp results
       sessionState.out = new PrintStream(new FileOutputStream(sessionState.getTmpOutputFile()), true, "UTF-8");
@@ -149,11 +150,14 @@ public class HiveCommandOperation extends ExecuteStatementOperation {
    */
   @Override
   public RowSet getNextRowSet(FetchOrientation orientation, long maxRows) throws HiveSQLException {
+	//LOG.warn("Hey RD, this guy has now called getNextRowSet from HiveCOmmandOperation");
     validateDefaultFetchOrientation(orientation);
     if (orientation.equals(FetchOrientation.FETCH_FIRST)) {
       resetResultReader();
     }
+    //Log.warn("Hey RD, calling readResults from HiveCommandOperation");
     List<String> rows = readResults((int) maxRows);
+    //Log.warn("Hey RD, now creating a rowSetFactory using resultSchema");
     RowSet rowSet = RowSetFactory.create(resultSchema, getProtocolVersion());
 
     for (String row : rows) {
@@ -169,6 +173,7 @@ public class HiveCommandOperation extends ExecuteStatementOperation {
    */
   private List<String> readResults(int nLines) throws HiveSQLException {
     if (resultReader == null) {
+	//Log.warn("Hey RD, reading results using readResults() with numLines: " + nLines);
       SessionState sessionState = getParentSession().getSessionState();
       File tmp = sessionState.getTmpOutputFile();
       try {

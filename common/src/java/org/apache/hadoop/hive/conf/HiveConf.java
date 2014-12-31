@@ -1909,7 +1909,7 @@ public class HiveConf extends Configuration {
         "and use it to run queries."),
 
     // Vectorization enabled
-    HIVE_VECTORIZATION_ENABLED("hive.vectorized.execution.enabled", false,
+    HIVE_VECTORIZATION_ENABLED("hive.vectorized.execution.enabled", false),
         "This flag should be set to true to enable vectorized mode of query execution.\n" +
         "The default value is false."),
     HIVE_VECTORIZATION_REDUCE_ENABLED("hive.vectorized.execution.reduce.enabled", true,
@@ -1987,7 +1987,6 @@ public class HiveConf extends Configuration {
         "Time to wait for another thread to localize the same resource for hive-tez."),
     HIVE_LOCALIZE_RESOURCE_NUM_WAIT_ATTEMPTS("hive.localize.resource.num.wait.attempts", 5,
         "The number of attempts waiting for localizing a resource in hive-tez."),
-    TEZ_AUTO_REDUCER_PARALLELISM("hive.tez.auto.reducer.parallelism", false,
         "Turn on Tez' auto reducer parallelism feature. When enabled, Hive will still estimate data sizes\n" +
         "and set parallelism estimates. Tez will sample source vertices' output sizes and adjust the estimates at runtime as\n" +
         "necessary."),
@@ -2043,8 +2042,9 @@ public class HiveConf extends Configuration {
     NWAYJOINREORDER("hive.reorder.nway.joins", true,
       "Runs reordering of tables within single n-way join (i.e.: picks streamtable)"),
     HIVE_LOG_N_RECORDS("hive.log.every.n.records", 0L, new RangeValidator(0L, null),
-      "If value is greater than 0 logs in fixed intervals of size n rather than exponentially.");
-
+      "If value is greater than 0 logs in fixed intervals of size n rather than exponentially."),
+    HIVE_SERVER2_COMPRESSOR_BUILDER_IMPL("hive.plugin.compressor", "");
+	
     public final String varname;
     private final String defaultExpr;
 
