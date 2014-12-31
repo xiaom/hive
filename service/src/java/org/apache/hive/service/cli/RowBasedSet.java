@@ -137,4 +137,9 @@ public class RowBasedSet implements RowSet {
       super.removeRange(fromIndex, toIndex);
     }
   }
+
+  @Override
+  public RowSet setArgs(String... args) {
+    return this;
+  }
 }

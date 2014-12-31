@@ -24,7 +24,8 @@ struct TProtocolVersion {
     HIVE_CLI_SERVICE_PROTOCOL_V4 = 3,
     HIVE_CLI_SERVICE_PROTOCOL_V5 = 4,
     HIVE_CLI_SERVICE_PROTOCOL_V6 = 5,
-    HIVE_CLI_SERVICE_PROTOCOL_V7 = 6
+    HIVE_CLI_SERVICE_PROTOCOL_V7 = 6,
+    HIVE_CLI_SERVICE_PROTOCOL_V8 = 7
   };
 };
 
@@ -1639,16 +1640,75 @@ class TColumn {
 
 void swap(TColumn &a, TColumn &b);
 
+
+class TEnColumn {
+ public:
+
+  static const char* ascii_fingerprint; // = "6D1E1C5BB0FAD3801490643606BE38C8";
+  static const uint8_t binary_fingerprint[16]; // = {0x6D,0x1E,0x1C,0x5B,0xB0,0xFA,0xD3,0x80,0x14,0x90,0x64,0x36,0x06,0xBE,0x38,0xC8};
+
+  TEnColumn() : enData(), nulls(), type((TTypeId::type)0), size(0) {
+  }
+
+  virtual ~TEnColumn() throw() {}
+
+  std::string enData;
+  std::string nulls;
+  TTypeId::type type;
+  int32_t size;
+
+  void __set_enData(const std::string& val) {
+    enData = val;
+  }
+
+  void __set_nulls(const std::string& val) {
+    nulls = val;
+  }
+
+  void __set_type(const TTypeId::type val) {
+    type = val;
+  }
+
+  void __set_size(const int32_t val) {
+    size = val;
+  }
+
+  bool operator == (const TEnColumn & rhs) const
+  {
+    if (!(enData == rhs.enData))
+      return false;
+    if (!(nulls == rhs.nulls))
+      return false;
+    if (!(type == rhs.type))
+      return false;
+    if (!(size == rhs.size))
+      return false;
+    return true;
+  }
+  bool operator != (const TEnColumn &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const TEnColumn & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(TEnColumn &a, TEnColumn &b);
+
 typedef struct _TRowSet__isset {
-  _TRowSet__isset() : columns(false) {}
+  _TRowSet__isset() : columns(false), enColumns(false) {}
   bool columns;
+  bool enColumns;
 } _TRowSet__isset;
 
 class TRowSet {
  public:
 
-  static const char* ascii_fingerprint; // = "46DA30A870489C7A58105AE0080DAEBF";
-  static const uint8_t binary_fingerprint[16]; // = {0x46,0xDA,0x30,0xA8,0x70,0x48,0x9C,0x7A,0x58,0x10,0x5A,0xE0,0x08,0x0D,0xAE,0xBF};
+  static const char* ascii_fingerprint; // = "1B3FCCDE99B84EB625ABD311308A9246";
+  static const uint8_t binary_fingerprint[16]; // = {0x1B,0x3F,0xCC,0xDE,0x99,0xB8,0x4E,0xB6,0x25,0xAB,0xD3,0x11,0x30,0x8A,0x92,0x46};
 
   TRowSet() : startRowOffset(0) {
   }
@@ -1658,6 +1718,7 @@ class TRowSet {
   int64_t startRowOffset;
   std::vector<TRow>  rows;
   std::vector<TColumn>  columns;
+  std::vector<TEnColumn>  enColumns;
 
   _TRowSet__isset __isset;
 
@@ -1674,6 +1735,11 @@ class TRowSet {
     __isset.columns = true;
   }
 
+  void __set_enColumns(const std::vector<TEnColumn> & val) {
+    enColumns = val;
+    __isset.enColumns = true;
+  }
+
   bool operator == (const TRowSet & rhs) const
   {
     if (!(startRowOffset == rhs.startRowOffset))
@@ -1683,6 +1749,10 @@ class TRowSet {
     if (__isset.columns != rhs.__isset.columns)
       return false;
     else if (__isset.columns && !(columns == rhs.columns))
+      return false;
+    if (__isset.enColumns != rhs.__isset.enColumns)
+      return false;
+    else if (__isset.enColumns && !(enColumns == rhs.enColumns))
       return false;
     return true;
   }
@@ -1946,8 +2016,8 @@ class TOpenSessionReq {
   static const char* ascii_fingerprint; // = "C8FD0F306A16C16BDA7B57F58BFAE5B2";
   static const uint8_t binary_fingerprint[16]; // = {0xC8,0xFD,0x0F,0x30,0x6A,0x16,0xC1,0x6B,0xDA,0x7B,0x57,0xF5,0x8B,0xFA,0xE5,0xB2};
 
-  TOpenSessionReq() : client_protocol((TProtocolVersion::type)5), username(), password() {
-    client_protocol = (TProtocolVersion::type)5;
+  TOpenSessionReq() : client_protocol((TProtocolVersion::type)7), username(), password() {
+    client_protocol = (TProtocolVersion::type)7;
 
   }
 
@@ -2022,8 +2092,8 @@ class TOpenSessionResp {
   static const char* ascii_fingerprint; // = "CFE7D7F4E9EC671F2518ED74FEE9F163";
   static const uint8_t binary_fingerprint[16]; // = {0xCF,0xE7,0xD7,0xF4,0xE9,0xEC,0x67,0x1F,0x25,0x18,0xED,0x74,0xFE,0xE9,0xF1,0x63};
 
-  TOpenSessionResp() : serverProtocolVersion((TProtocolVersion::type)5) {
-    serverProtocolVersion = (TProtocolVersion::type)5;
+  TOpenSessionResp() : serverProtocolVersion((TProtocolVersion::type)7) {
+    serverProtocolVersion = (TProtocolVersion::type)7;
 
   }
 
@@ -3664,8 +3734,8 @@ typedef struct _TFetchResultsResp__isset {
 class TFetchResultsResp {
  public:
 
-  static const char* ascii_fingerprint; // = "FC43BC2D6F3B76D4DB0F34226A745C8E";
-  static const uint8_t binary_fingerprint[16]; // = {0xFC,0x43,0xBC,0x2D,0x6F,0x3B,0x76,0xD4,0xDB,0x0F,0x34,0x22,0x6A,0x74,0x5C,0x8E};
+  static const char* ascii_fingerprint; // = "90BFACC654715CA32F38269B793B881E";
+  static const uint8_t binary_fingerprint[16]; // = {0x90,0xBF,0xAC,0xC6,0x54,0x71,0x5C,0xA3,0x2F,0x38,0x26,0x9B,0x79,0x3B,0x88,0x1E};
 
   TFetchResultsResp() : hasMoreRows(0) {
   }

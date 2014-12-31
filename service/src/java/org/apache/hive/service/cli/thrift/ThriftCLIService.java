@@ -20,6 +20,7 @@ package org.apache.hive.service.cli.thrift;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.derby.iapi.services.io.ArrayUtil;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hive.service.AbstractService;
@@ -42,6 +44,7 @@ import org.apache.hive.service.cli.OperationStatus;
 import org.apache.hive.service.cli.RowSet;
 import org.apache.hive.service.cli.SessionHandle;
 import org.apache.hive.service.cli.TableSchema;
+import org.apache.hive.service.cli.session.HiveSessionImpl;
 import org.apache.hive.service.cli.session.SessionManager;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
@@ -190,7 +193,7 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
     try {
       SessionHandle sessionHandle = getSessionHandle(req, resp);
       resp.setSessionHandle(sessionHandle.toTSessionHandle());
-      // TODO: set real configuration map
+    	cliService.getSessionManager().getSession(sessionHandle).setData("compressor",req.getConfiguration().get("CompressorInfo"));  
       resp.setConfiguration(new HashMap<String, String>());
       resp.setStatus(OK_STATUS);
     } catch (Exception e) {
@@ -527,15 +530,19 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
   public TFetchResultsResp FetchResults(TFetchResultsReq req) throws TException {
     TFetchResultsResp resp = new TFetchResultsResp();
     try {
+      //LOG.warn("Hey RD, called FetchResults with maxRows " + req.getMaxRows() + " and now calling fetchResults in cliService");
+    	String compressor = this.cliService.getSessionManager().getOperationManager().getOperation(new OperationHandle(req.getOperationHandle())).getParentSession().getData("compressor");
       RowSet rowSet = cliService.fetchResults(
           new OperationHandle(req.getOperationHandle()),
           FetchOrientation.getFetchOrientation(req.getOrientation()),
           req.getMaxRows());
+      //rowSet.setArgs(this.hiveConf.get(ConfVars.HIVE_SERVER2_COMPRESSOR_BUILDER_IMPL.varname));
+      rowSet.setArgs(compressor);
       resp.setResults(rowSet.toTRowSet());
       resp.setHasMoreRows(false);
       resp.setStatus(OK_STATUS);
     } catch (Exception e) {
-      LOG.warn("Error fetching results: ", e);
+      //LOG.warn("Error fetching results: ", e);
       resp.setStatus(HiveSQLException.toTStatus(e));
     }
     return resp;

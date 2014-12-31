@@ -972,7 +972,7 @@ public class HiveConf extends Configuration {
     HIVE_USER_INSTALL_DIR("hive.user.install.directory", "hdfs:///user/"),
 
     // Vectorization enabled
-    HIVE_VECTORIZATION_ENABLED("hive.vectorized.execution.enabled", false),
+    HIVE_VECTORIZATION_ENABLED("hive.hive.metastore.urisvectorized.execution.enabled", false),
     HIVE_VECTORIZATION_GROUPBY_CHECKINTERVAL("hive.vectorized.groupby.checkinterval", 100000),
     HIVE_VECTORIZATION_GROUPBY_MAXENTRIES("hive.vectorized.groupby.maxentries", 1000000),
     HIVE_VECTORIZATION_GROUPBY_FLUSH_PERCENT("hive.vectorized.groupby.flush.percent", (float) 0.1),
@@ -1019,6 +1019,7 @@ public class HiveConf extends Configuration {
     HIVE_CHECK_CROSS_PRODUCT("hive.exec.check.crossproducts", true),
     HIVE_LOCALIZE_RESOURCE_WAIT_INTERVAL("hive.localize.resource.wait.interval", 5000L), // in ms
     HIVE_LOCALIZE_RESOURCE_NUM_WAIT_ATTEMPTS("hive.localize.resource.num.wait.attempts", 5),
+    HIVE_SERVER2_COMPRESSOR_BUILDER_IMPL("hive.plugin.compressor", ""),
     ;
 
     public final String varname;
