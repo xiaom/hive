@@ -1,0 +1,7 @@
+hive:
+    image: xiaom/hivec
+    hostname: hivec
+    ports:
+        - "10000:10000"
+    volumes:
+        - share:/share

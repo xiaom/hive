@@ -1,0 +1,2 @@
+#!/bin/sh
+docker exec hive bin/hive -f load_Integer_Table.hql

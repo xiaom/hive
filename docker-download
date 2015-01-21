@@ -1,0 +1,4 @@
+#! /bin/sh
+HADOOP_VERSION=2.6.0
+curl -SsfLO "http://www.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz"
+mv hadoop-$HADOOP_VERSION.tar.gz docker-root/opt/
