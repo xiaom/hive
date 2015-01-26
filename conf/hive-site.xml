@@ -19,4 +19,8 @@
 
 <configuration>
 
+<property>
+	<name>hive.resultset.compression.enabled</name>
+	<value>true</value>
+</property>
 </configuration>

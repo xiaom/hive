@@ -188,12 +188,32 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
 
   @Override
   public TOpenSessionResp OpenSession(TOpenSessionReq req) throws TException {
+	  /*
+	   * This OpenSession method, on top of starting a session does two more things: 
+	   * It checks the value of "hive.resultset.compression.enabled". If it is set to true, 
+	   * it sets data for the session to compressorInfo from the client 
+	   * If it's not, then, it just sets compressorInfo to "nocompression", which EncodedCBS understands to 
+	   * do not compress the column. 
+	   * With the help of this switch "hive.resultset.compression.enabled, we are able to switch on/off compression 
+	   * on the server side
+	   */
     LOG.info("Client protocol version: " + req.getClient_protocol());
     TOpenSessionResp resp = new TOpenSessionResp();
     try {
       SessionHandle sessionHandle = getSessionHandle(req, resp);
       resp.setSessionHandle(sessionHandle.toTSessionHandle());
-    	cliService.getSessionManager().getSession(sessionHandle).setData("compressor",req.getConfiguration().get("CompressorInfo"));  
+      
+      if (this.hiveConf.getBoolVar(ConfVars.HIVE_SERVER2_RESULTSET_COMPRESSOR_ENABLED) == false) {
+    	  System.out.println("Hive compression disabled!");
+    	  cliService.getSessionManager().getSession(sessionHandle).setData("compressor","nocompression");
+      }
+      else {
+    	  /*
+    	   * We assume that the default is true. so, if it is not false, it is either set to true (which is good) or it is not set but we assume it's true
+    	   */
+    	  System.out.println("Compression enabled!");
+    	  cliService.getSessionManager().getSession(sessionHandle).setData("compressor",req.getConfiguration().get("CompressorInfo"));
+      }
       resp.setConfiguration(new HashMap<String, String>());
       resp.setStatus(OK_STATUS);
     } catch (Exception e) {
@@ -531,7 +551,8 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
     TFetchResultsResp resp = new TFetchResultsResp();
     try {
       //LOG.warn("Hey RD, called FetchResults with maxRows " + req.getMaxRows() + " and now calling fetchResults in cliService");
-    	String compressor = this.cliService.getSessionManager().getOperationManager().getOperation(new OperationHandle(req.getOperationHandle())).getParentSession().getData("compressor");
+      String compressor = this.cliService.getSessionManager().getOperationManager().getOperation(new OperationHandle(req.getOperationHandle())).getParentSession().getData("compressor");
+      //System.out.println("Compressor in fetchResults is " + compressor);
       RowSet rowSet = cliService.fetchResults(
           new OperationHandle(req.getOperationHandle()),
           FetchOrientation.getFetchOrientation(req.getOrientation()),
