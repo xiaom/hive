@@ -2043,8 +2043,8 @@ public class HiveConf extends Configuration {
       "Runs reordering of tables within single n-way join (i.e.: picks streamtable)"),
     HIVE_LOG_N_RECORDS("hive.log.every.n.records", 0L, new RangeValidator(0L, null),
       "If value is greater than 0 logs in fixed intervals of size n rather than exponentially."),
-    HIVE_SERVER2_COMPRESSOR_BUILDER_IMPL("hive.plugin.compressor", "");
-	
+    HIVE_SERVER2_COMPRESSOR_BUILDER_IMPL("hive.plugin.compressor", ""),
+	HIVE_SERVER2_RESULTSET_COMPRESSOR_ENABLED("hive.resultset.compression.enabled", true);	
     public final String varname;
     private final String defaultExpr;
 
