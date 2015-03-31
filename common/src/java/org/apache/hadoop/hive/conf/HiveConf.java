@@ -1020,7 +1020,7 @@ public class HiveConf extends Configuration {
     HIVE_LOCALIZE_RESOURCE_WAIT_INTERVAL("hive.localize.resource.wait.interval", 5000L), // in ms
     HIVE_LOCALIZE_RESOURCE_NUM_WAIT_ATTEMPTS("hive.localize.resource.num.wait.attempts", 5),
     HIVE_SERVER2_COMPRESSOR_BUILDER_IMPL("hive.plugin.compressor", ""),
-
+    HIVE_SERVER2_RESULTSET_COMPRESSOR_DISABLE("hive.resultSet.compressor.disable",""),
     HIVE_SERVER2_RESULTSET_COMPRESSOR_ENABLED("hive.resultset.compression.enabled", true);
     public final String varname;
     public final String defaultVal;

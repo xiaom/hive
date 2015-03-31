@@ -4,10 +4,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hive.service.cli.thrift.TEnColumn;
 import org.apache.hive.service.cli.thrift.TRowSet;
 import org.apache.hive.service.cli.thrift.TRow;
@@ -38,6 +40,11 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
     private String compressorInfo;
     private static ColumnCompressor columnCompressorImpl = null;
 
+    private HiveConf hiveConf = new HiveConf();
+    private String[] listCompressor = this.hiveConf.getVar(ConfVars.HIVE_SERVER2_RESULTSET_COMPRESSOR_DISABLE).split(",");
+    private List<String> compressorList = Arrays.asList(listCompressor);
+    
+    
     public EncodedColumnBasedSet(TableSchema schema) {
         super(schema);
     }
@@ -63,6 +70,14 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
         return nulls;
     }
 
+     
+    private void addToUnCompressedData(TRowSet tRowSet, int i, BitSet bitmap) {
+    	/*
+    	 * Given an index, update the TRowSet with the column (uncompressed) and update the bitmap with that index set to false
+    	 */
+    	tRowSet.addToColumns(columns.get(i).toTColumn());
+    	bitmap.set(i, false);
+    }
     @Override
     public TRowSet toTRowSet() {
         /*
@@ -78,8 +93,7 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
         if (this.compressorInfo == "nocompression") {
             System.out.println("Getting nocompression from compressorInfo");
             for(int i = 0; i < columns.size(); i++) {
-                tRowSet.addToColumns(columns.get(i).toTColumn());
-                compressorBitmap.set(i, false);
+               addToUnCompressedData(tRowSet, i, compressorBitmap);
             }
         }
         else {
@@ -104,15 +118,22 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
                 catch(JSONException e) {
 
                 }
-                String compressorName = vendor + "." + compressorSet;
+                String compressorName = vendor + "." + compressorSet + "." + entryClass;
+               // System.out.println(compressorList.get(0) == compressorName);
+                if (compressorList.contains(compressorName)==true) {
+                	addToUnCompressedData(tRowSet, i, compressorBitmap);
+                	continue;
+                }
+                
                 try {
-                    columnCompressorImpl = (ColumnCompressor) Class.forName(compressorName + "." + entryClass).newInstance();
+                    columnCompressorImpl = (ColumnCompressor) Class.forName(compressorName).newInstance();
                 } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-
-                    tRowSet.addToColumns(columns.get(i).toTColumn());
-
-                    compressorBitmap.set(i, false);
+                    addToUnCompressedData(tRowSet, i, compressorBitmap);
                     continue;
+                }
+                if (columnCompressorImpl.isCompressable(columns.get(i)) == false) {
+                	addToUnCompressedData(tRowSet, i, compressorBitmap);
+                	continue;
                 }
                 TEnColumn tEnColumn = new TEnColumn();
                 int size = columns.get(i).size();
@@ -129,7 +150,7 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
                 tRowSet.addToEnColumns(tEnColumn);
             }
         }
-
+        System.out.println(compressorBitmap);
         ByteBuffer bitmap = ByteBuffer.wrap(toBinary(compressorBitmap));
         tRowSet.setCompressorBitmap(bitmap);
         return tRowSet;

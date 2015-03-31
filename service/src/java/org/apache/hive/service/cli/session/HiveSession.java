@@ -48,6 +48,8 @@ public interface HiveSession extends HiveSessionBase {
    */
   public void setData(String key, String value);
   
+    
+  
   public IMetaStoreClient getMetaStoreClient() throws HiveSQLException;
 
   /**

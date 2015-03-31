@@ -213,6 +213,8 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
     	   */
     	  System.out.println("Compression enabled!");
     	  cliService.getSessionManager().getSession(sessionHandle).setData("compressor",req.getConfiguration().get("CompressorInfo"));
+    	  String[] compressorList = this.hiveConf.getStrings("hive.resultSet.compressor.disable");
+    	  
       }
       resp.setConfiguration(new HashMap<String, String>());
       resp.setStatus(OK_STATUS);
