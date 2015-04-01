@@ -1,5 +1,6 @@
 build
 build-eclipse
+.metadata/*
 .arc_jira_lib
 .classpath*
 .externalToolBuilders
