@@ -39,7 +39,11 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
 
     private String compressorInfo;
     private static ColumnCompressor columnCompressorImpl = null;
-
+    /*
+     * A list of compressors that shouldn't be used can be specified as comma separated values under the property "hive.resultSet.compressor.disable". These values
+     * are read here, and for each column below, the compressor specified by the client is checked for in the list. If present in the compressorList, that compressor is NOT used
+     * and the column is sent as-is
+     */
     private HiveConf hiveConf = new HiveConf();
     private String[] listCompressor = this.hiveConf.getVar(ConfVars.HIVE_SERVER2_RESULTSET_COMPRESSOR_DISABLE).split(",");
     private List<String> compressorList = Arrays.asList(listCompressor);
@@ -81,8 +85,8 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
     @Override
     public TRowSet toTRowSet() {
         /*
-         * Main function that converts the columns in the RowSet if the compressorInfo points to a valid class
-         * To handle uncompressed columns, we fall back to the catch block of the try/catch block
+         * Main function that converts the columns in the RowSet if the compressorInfo points to a valid class and the compressor is not part of the disable compressorList (referred to above)
+         *
          */
 
         TRowSet tRowSet = new TRowSet(getStartOffset(), new ArrayList<TRow>());
@@ -91,7 +95,6 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
         BitSet compressorBitmap = new BitSet();
 
         if (this.compressorInfo == "nocompression") {
-            System.out.println("Getting nocompression from compressorInfo");
             for(int i = 0; i < columns.size(); i++) {
                addToUnCompressedData(tRowSet, i, compressorBitmap);
             }
@@ -119,7 +122,6 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
 
                 }
                 String compressorName = vendor + "." + compressorSet + "." + entryClass;
-               // System.out.println(compressorList.get(0) == compressorName);
                 if (compressorList.contains(compressorName)==true) {
                 	addToUnCompressedData(tRowSet, i, compressorBitmap);
                 	continue;
@@ -150,7 +152,6 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
                 tRowSet.addToEnColumns(tEnColumn);
             }
         }
-        System.out.println(compressorBitmap);
         ByteBuffer bitmap = ByteBuffer.wrap(toBinary(compressorBitmap));
         tRowSet.setCompressorBitmap(bitmap);
         return tRowSet;

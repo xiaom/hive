@@ -204,17 +204,13 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
       resp.setSessionHandle(sessionHandle.toTSessionHandle());
       
       if (this.hiveConf.getBoolVar(ConfVars.HIVE_SERVER2_RESULTSET_COMPRESSOR_ENABLED) == false) {
-    	  System.out.println("Hive compression disabled!");
     	  cliService.getSessionManager().getSession(sessionHandle).setData("compressor","nocompression");
       }
       else {
     	  /*
     	   * We assume that the default is true. so, if it is not false, it is either set to true (which is good) or it is not set but we assume it's true
     	   */
-    	  System.out.println("Compression enabled!");
     	  cliService.getSessionManager().getSession(sessionHandle).setData("compressor",req.getConfiguration().get("CompressorInfo"));
-    	  String[] compressorList = this.hiveConf.getStrings("hive.resultSet.compressor.disable");
-    	  
       }
       resp.setConfiguration(new HashMap<String, String>());
       resp.setStatus(OK_STATUS);
