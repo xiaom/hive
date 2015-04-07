@@ -71,7 +71,7 @@ public class HiveSessionImpl implements HiveSession {
   private String ipAddress;
 
   private static final String FETCH_WORK_SERDE_CLASS =
-      "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe";
+    "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe";
   private static final Log LOG = LogFactory.getLog(HiveSessionImpl.class);
 
   private String compression_class = null;
@@ -82,7 +82,7 @@ public class HiveSessionImpl implements HiveSession {
   private final Set<OperationHandle> opHandleSet = new HashSet<OperationHandle>();
 
   public HiveSessionImpl(TProtocolVersion protocol, String username, String password,
-      HiveConf serverhiveConf, Map<String, String> sessionConfMap, String ipAddress) {
+                         HiveConf serverhiveConf, Map<String, String> sessionConfMap, String ipAddress) {
     this.username = username;
     this.password = password;
     this.sessionHandle = new SessionHandle(protocol);
@@ -97,10 +97,10 @@ public class HiveSessionImpl implements HiveSession {
     }
     // set an explicit session name to control the download directory name
     hiveConf.set(ConfVars.HIVESESSIONID.varname,
-        sessionHandle.getHandleIdentifier().toString());
+                 sessionHandle.getHandleIdentifier().toString());
     // use thrift transportable formatter
     hiveConf.set(ListSinkOperator.OUTPUT_FORMATTER,
-        FetchFormatter.ThriftFormatter.class.getName());
+                 FetchFormatter.ThriftFormatter.class.getName());
     hiveConf.setInt(ListSinkOperator.OUTPUT_PROTOCOL, protocol.getValue());
     sessionState = new SessionState(hiveConf, username);
     sessionState.setIsHiveServerQuery(true);
@@ -182,7 +182,7 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public GetInfoValue getInfo(GetInfoType getInfoType)
-      throws HiveSQLException {
+  throws HiveSQLException {
     acquire();
     try {
       switch (getInfoType) {
@@ -209,24 +209,24 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public OperationHandle executeStatement(String statement, Map<String, String> confOverlay)
-      throws HiveSQLException {
+  throws HiveSQLException {
     return executeStatementInternal(statement, confOverlay, false);
   }
 
   @Override
   public OperationHandle executeStatementAsync(String statement, Map<String, String> confOverlay)
-      throws HiveSQLException {
+  throws HiveSQLException {
     return executeStatementInternal(statement, confOverlay, true);
   }
 
   private OperationHandle executeStatementInternal(String statement, Map<String, String> confOverlay,
       boolean runAsync)
-          throws HiveSQLException {
+  throws HiveSQLException {
     acquire();
 
     OperationManager operationManager = getOperationManager();
     ExecuteStatementOperation operation = operationManager
-        .newExecuteStatementOperation(getSession(), statement, confOverlay, runAsync);
+                                          .newExecuteStatementOperation(getSession(), statement, confOverlay, runAsync);
     OperationHandle opHandle = operation.getHandle();
     try {
       operation.run();
@@ -246,7 +246,7 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public OperationHandle getTypeInfo()
-      throws HiveSQLException {
+  throws HiveSQLException {
     acquire();
 
     OperationManager operationManager = getOperationManager();
@@ -266,7 +266,7 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public OperationHandle getCatalogs()
-      throws HiveSQLException {
+  throws HiveSQLException {
     acquire();
 
     OperationManager operationManager = getOperationManager();
@@ -286,12 +286,12 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public OperationHandle getSchemas(String catalogName, String schemaName)
-      throws HiveSQLException {
+  throws HiveSQLException {
     acquire();
 
     OperationManager operationManager = getOperationManager();
     GetSchemasOperation operation =
-        operationManager.newGetSchemasOperation(getSession(), catalogName, schemaName);
+      operationManager.newGetSchemasOperation(getSession(), catalogName, schemaName);
     OperationHandle opHandle = operation.getHandle();
     try {
       operation.run();
@@ -307,13 +307,13 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public OperationHandle getTables(String catalogName, String schemaName, String tableName,
-      List<String> tableTypes)
-          throws HiveSQLException {
+                                   List<String> tableTypes)
+  throws HiveSQLException {
     acquire();
 
     OperationManager operationManager = getOperationManager();
     MetadataOperation operation =
-        operationManager.newGetTablesOperation(getSession(), catalogName, schemaName, tableName, tableTypes);
+      operationManager.newGetTablesOperation(getSession(), catalogName, schemaName, tableName, tableTypes);
     OperationHandle opHandle = operation.getHandle();
     try {
       operation.run();
@@ -329,7 +329,7 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public OperationHandle getTableTypes()
-      throws HiveSQLException {
+  throws HiveSQLException {
     acquire();
 
     OperationManager operationManager = getOperationManager();
@@ -349,12 +349,12 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public OperationHandle getColumns(String catalogName, String schemaName,
-      String tableName, String columnName)  throws HiveSQLException {
+                                    String tableName, String columnName)  throws HiveSQLException {
     acquire();
 
     OperationManager operationManager = getOperationManager();
     GetColumnsOperation operation = operationManager.newGetColumnsOperation(getSession(),
-        catalogName, schemaName, tableName, columnName);
+                                    catalogName, schemaName, tableName, columnName);
     OperationHandle opHandle = operation.getHandle();
     try {
       operation.run();
@@ -370,12 +370,12 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public OperationHandle getFunctions(String catalogName, String schemaName, String functionName)
-      throws HiveSQLException {
+  throws HiveSQLException {
     acquire();
 
     OperationManager operationManager = getOperationManager();
     GetFunctionsOperation operation = operationManager
-        .newGetFunctionsOperation(getSession(), catalogName, schemaName, functionName);
+                                      .newGetFunctionsOperation(getSession(), catalogName, schemaName, functionName);
     OperationHandle opHandle = operation.getHandle();
     try {
       operation.run();
@@ -466,11 +466,11 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public RowSet fetchResults(OperationHandle opHandle, FetchOrientation orientation, long maxRows)
-      throws HiveSQLException {
+  throws HiveSQLException {
     acquire();
     try {
       return sessionManager.getOperationManager()
-          .getOperationNextRowSet(opHandle, orientation, maxRows);
+             .getOperationNextRowSet(opHandle, orientation, maxRows);
     } finally {
       release();
     }
@@ -502,24 +502,24 @@ public class HiveSessionImpl implements HiveSession {
 
   @Override
   public String getDelegationToken(HiveAuthFactory authFactory, String owner, String renewer)
-      throws HiveSQLException {
+  throws HiveSQLException {
     HiveAuthFactory.verifyProxyAccess(getUsername(), owner, getIpAddress(), getHiveConf());
     return authFactory.getDelegationToken(owner, renewer);
   }
 
   @Override
   public void cancelDelegationToken(HiveAuthFactory authFactory, String tokenStr)
-      throws HiveSQLException {
+  throws HiveSQLException {
     HiveAuthFactory.verifyProxyAccess(getUsername(), getUserFromToken(authFactory, tokenStr),
-        getIpAddress(), getHiveConf());
+                                      getIpAddress(), getHiveConf());
     authFactory.cancelDelegationToken(tokenStr);
   }
 
   @Override
   public void renewDelegationToken(HiveAuthFactory authFactory, String tokenStr)
-      throws HiveSQLException {
+  throws HiveSQLException {
     HiveAuthFactory.verifyProxyAccess(getUsername(), getUserFromToken(authFactory, tokenStr),
-        getIpAddress(), getHiveConf());
+                                      getIpAddress(), getHiveConf());
     authFactory.renewDelegationToken(tokenStr);
   }
 
@@ -528,13 +528,13 @@ public class HiveSessionImpl implements HiveSession {
     return authFactory.getUserFromToken(tokenStr);
   }
 
-@Override
-public String getData(String key) {
-	return compression_class;
-}
+  @Override
+  public String getData(String key) {
+    return compression_class;
+  }
 
-@Override
-public void setData(String key, String value) {
-	compression_class = value;
-}
+  @Override
+  public void setData(String key, String value) {
+    compression_class = value;
+  }
 }

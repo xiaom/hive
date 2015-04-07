@@ -405,7 +405,6 @@ public class CLIService extends CompositeService implements ICLIService {
     RowSet rowSet = sessionManager.getOperationManager().getOperation(opHandle)
         .getParentSession().fetchResults(opHandle, orientation, maxRows);
     LOG.debug(opHandle + ": fetchResults()");
-    //LOG.debug("Hey RD, Returning rowSet with numRows : " + rowSet.numRows() + " and numColumns : " + rowSet.numColumns()); 
     return rowSet;
   }
 
@@ -481,7 +480,7 @@ public class CLIService extends CompositeService implements ICLIService {
     sessionManager.getSession(sessionHandle).renewDelegationToken(authFactory, tokenStr);
     LOG.info(sessionHandle  + ": renewDelegationToken()");
   }
-  
+
   public SessionManager getSessionManager(){
 	  return sessionManager;
   }

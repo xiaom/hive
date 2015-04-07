@@ -14,7 +14,7 @@ import org.apache.hadoop.classification.InterfaceStability;
  * compress(Column col) would accept a column as argument and return a byte array
  */
 public interface ColumnCompressor {
-	public boolean isCompressable(Column col);
-	public byte[] compress(Column col);
+  public boolean isCompressable(Column col);
+  public byte[] compress(Column col);
 }
 
