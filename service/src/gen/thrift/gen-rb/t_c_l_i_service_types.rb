@@ -15,8 +15,9 @@ module TProtocolVersion
   HIVE_CLI_SERVICE_PROTOCOL_V6 = 5
   HIVE_CLI_SERVICE_PROTOCOL_V7 = 6
   HIVE_CLI_SERVICE_PROTOCOL_V8 = 7
-  VALUE_MAP = {0 => "HIVE_CLI_SERVICE_PROTOCOL_V1", 1 => "HIVE_CLI_SERVICE_PROTOCOL_V2", 2 => "HIVE_CLI_SERVICE_PROTOCOL_V3", 3 => "HIVE_CLI_SERVICE_PROTOCOL_V4", 4 => "HIVE_CLI_SERVICE_PROTOCOL_V5", 5 => "HIVE_CLI_SERVICE_PROTOCOL_V6", 6 => "HIVE_CLI_SERVICE_PROTOCOL_V7", 7 => "HIVE_CLI_SERVICE_PROTOCOL_V8"}
-  VALID_VALUES = Set.new([HIVE_CLI_SERVICE_PROTOCOL_V1, HIVE_CLI_SERVICE_PROTOCOL_V2, HIVE_CLI_SERVICE_PROTOCOL_V3, HIVE_CLI_SERVICE_PROTOCOL_V4, HIVE_CLI_SERVICE_PROTOCOL_V5, HIVE_CLI_SERVICE_PROTOCOL_V6, HIVE_CLI_SERVICE_PROTOCOL_V7, HIVE_CLI_SERVICE_PROTOCOL_V8]).freeze
+  HIVE_CLI_SERVICE_PROTOCOL_V9 = 8
+  VALUE_MAP = {0 => "HIVE_CLI_SERVICE_PROTOCOL_V1", 1 => "HIVE_CLI_SERVICE_PROTOCOL_V2", 2 => "HIVE_CLI_SERVICE_PROTOCOL_V3", 3 => "HIVE_CLI_SERVICE_PROTOCOL_V4", 4 => "HIVE_CLI_SERVICE_PROTOCOL_V5", 5 => "HIVE_CLI_SERVICE_PROTOCOL_V6", 6 => "HIVE_CLI_SERVICE_PROTOCOL_V7", 7 => "HIVE_CLI_SERVICE_PROTOCOL_V8", 8 => "HIVE_CLI_SERVICE_PROTOCOL_V9"}
+  VALID_VALUES = Set.new([HIVE_CLI_SERVICE_PROTOCOL_V1, HIVE_CLI_SERVICE_PROTOCOL_V2, HIVE_CLI_SERVICE_PROTOCOL_V3, HIVE_CLI_SERVICE_PROTOCOL_V4, HIVE_CLI_SERVICE_PROTOCOL_V5, HIVE_CLI_SERVICE_PROTOCOL_V6, HIVE_CLI_SERVICE_PROTOCOL_V7, HIVE_CLI_SERVICE_PROTOCOL_V8, HIVE_CLI_SERVICE_PROTOCOL_V9]).freeze
 end
 
 module TTypeId
@@ -827,16 +828,52 @@ class TColumn < ::Thrift::Union
   ::Thrift::Union.generate_accessors self
 end
 
+class TEnColumn
+  include ::Thrift::Struct, ::Thrift::Struct_Union
+  ENDATA = 1
+  NULLS = 2
+  TYPE = 3
+  SIZE = 4
+  COMPRESSORNAME = 5
+
+  FIELDS = {
+    ENDATA => {:type => ::Thrift::Types::STRING, :name => 'enData', :binary => true},
+    NULLS => {:type => ::Thrift::Types::STRING, :name => 'nulls', :binary => true},
+    TYPE => {:type => ::Thrift::Types::I32, :name => 'type', :enum_class => ::TTypeId},
+    SIZE => {:type => ::Thrift::Types::I32, :name => 'size'},
+    COMPRESSORNAME => {:type => ::Thrift::Types::STRING, :name => 'compressorName'}
+  }
+
+  def struct_fields; FIELDS; end
+
+  def validate
+    raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field enData is unset!') unless @enData
+    raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field nulls is unset!') unless @nulls
+    raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field type is unset!') unless @type
+    raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field size is unset!') unless @size
+    raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field compressorName is unset!') unless @compressorName
+    unless @type.nil? || ::TTypeId::VALID_VALUES.include?(@type)
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Invalid value of field type!')
+    end
+  end
+
+  ::Thrift::Struct.generate_accessors self
+end
+
 class TRowSet
   include ::Thrift::Struct, ::Thrift::Struct_Union
   STARTROWOFFSET = 1
   ROWS = 2
   COLUMNS = 3
+  ENCOLUMNS = 4
+  COMPRESSORBITMAP = 5
 
   FIELDS = {
     STARTROWOFFSET => {:type => ::Thrift::Types::I64, :name => 'startRowOffset'},
     ROWS => {:type => ::Thrift::Types::LIST, :name => 'rows', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TRow}},
-    COLUMNS => {:type => ::Thrift::Types::LIST, :name => 'columns', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TColumn}, :optional => true}
+    COLUMNS => {:type => ::Thrift::Types::LIST, :name => 'columns', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TColumn}, :optional => true},
+    ENCOLUMNS => {:type => ::Thrift::Types::LIST, :name => 'enColumns', :element => {:type => ::Thrift::Types::STRUCT, :class => ::TEnColumn}, :optional => true},
+    COMPRESSORBITMAP => {:type => ::Thrift::Types::STRING, :name => 'compressorBitmap', :binary => true, :optional => true}
   }
 
   def struct_fields; FIELDS; end

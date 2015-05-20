@@ -25,7 +25,8 @@ struct TProtocolVersion {
     HIVE_CLI_SERVICE_PROTOCOL_V5 = 4,
     HIVE_CLI_SERVICE_PROTOCOL_V6 = 5,
     HIVE_CLI_SERVICE_PROTOCOL_V7 = 6,
-    HIVE_CLI_SERVICE_PROTOCOL_V8 = 7
+    HIVE_CLI_SERVICE_PROTOCOL_V8 = 7,
+    HIVE_CLI_SERVICE_PROTOCOL_V9 = 8
   };
 };
 
@@ -1642,18 +1643,85 @@ class TColumn {
 
 void swap(TColumn &a, TColumn &b);
 
+
+class TEnColumn {
+ public:
+
+  static const char* ascii_fingerprint; // = "C4125B153F648260127E2F8907DB448A";
+  static const uint8_t binary_fingerprint[16]; // = {0xC4,0x12,0x5B,0x15,0x3F,0x64,0x82,0x60,0x12,0x7E,0x2F,0x89,0x07,0xDB,0x44,0x8A};
+
+  TEnColumn() : enData(), nulls(), type((TTypeId::type)0), size(0), compressorName() {
+  }
+
+  virtual ~TEnColumn() throw() {}
+
+  std::string enData;
+  std::string nulls;
+  TTypeId::type type;
+  int32_t size;
+  std::string compressorName;
+
+  void __set_enData(const std::string& val) {
+    enData = val;
+  }
+
+  void __set_nulls(const std::string& val) {
+    nulls = val;
+  }
+
+  void __set_type(const TTypeId::type val) {
+    type = val;
+  }
+
+  void __set_size(const int32_t val) {
+    size = val;
+  }
+
+  void __set_compressorName(const std::string& val) {
+    compressorName = val;
+  }
+
+  bool operator == (const TEnColumn & rhs) const
+  {
+    if (!(enData == rhs.enData))
+      return false;
+    if (!(nulls == rhs.nulls))
+      return false;
+    if (!(type == rhs.type))
+      return false;
+    if (!(size == rhs.size))
+      return false;
+    if (!(compressorName == rhs.compressorName))
+      return false;
+    return true;
+  }
+  bool operator != (const TEnColumn &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const TEnColumn & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(TEnColumn &a, TEnColumn &b);
+
 typedef struct _TRowSet__isset {
-  _TRowSet__isset() : columns(false) {}
+  _TRowSet__isset() : columns(false), enColumns(false), compressorBitmap(false) {}
   bool columns;
+  bool enColumns;
+  bool compressorBitmap;
 } _TRowSet__isset;
 
 class TRowSet {
  public:
 
-  static const char* ascii_fingerprint; // = "46DA30A870489C7A58105AE0080DAEBF";
-  static const uint8_t binary_fingerprint[16]; // = {0x46,0xDA,0x30,0xA8,0x70,0x48,0x9C,0x7A,0x58,0x10,0x5A,0xE0,0x08,0x0D,0xAE,0xBF};
+  static const char* ascii_fingerprint; // = "8E980BCEDB71FA696E49ECA856CDDB6F";
+  static const uint8_t binary_fingerprint[16]; // = {0x8E,0x98,0x0B,0xCE,0xDB,0x71,0xFA,0x69,0x6E,0x49,0xEC,0xA8,0x56,0xCD,0xDB,0x6F};
 
-  TRowSet() : startRowOffset(0) {
+  TRowSet() : startRowOffset(0), compressorBitmap() {
   }
 
   virtual ~TRowSet() throw() {}
@@ -1661,6 +1729,8 @@ class TRowSet {
   int64_t startRowOffset;
   std::vector<TRow>  rows;
   std::vector<TColumn>  columns;
+  std::vector<TEnColumn>  enColumns;
+  std::string compressorBitmap;
 
   _TRowSet__isset __isset;
 
@@ -1677,6 +1747,16 @@ class TRowSet {
     __isset.columns = true;
   }
 
+  void __set_enColumns(const std::vector<TEnColumn> & val) {
+    enColumns = val;
+    __isset.enColumns = true;
+  }
+
+  void __set_compressorBitmap(const std::string& val) {
+    compressorBitmap = val;
+    __isset.compressorBitmap = true;
+  }
+
   bool operator == (const TRowSet & rhs) const
   {
     if (!(startRowOffset == rhs.startRowOffset))
@@ -1686,6 +1766,14 @@ class TRowSet {
     if (__isset.columns != rhs.__isset.columns)
       return false;
     else if (__isset.columns && !(columns == rhs.columns))
+      return false;
+    if (__isset.enColumns != rhs.__isset.enColumns)
+      return false;
+    else if (__isset.enColumns && !(enColumns == rhs.enColumns))
+      return false;
+    if (__isset.compressorBitmap != rhs.__isset.compressorBitmap)
+      return false;
+    else if (__isset.compressorBitmap && !(compressorBitmap == rhs.compressorBitmap))
       return false;
     return true;
   }
@@ -3683,8 +3771,8 @@ typedef struct _TFetchResultsResp__isset {
 class TFetchResultsResp {
  public:
 
-  static const char* ascii_fingerprint; // = "FC43BC2D6F3B76D4DB0F34226A745C8E";
-  static const uint8_t binary_fingerprint[16]; // = {0xFC,0x43,0xBC,0x2D,0x6F,0x3B,0x76,0xD4,0xDB,0x0F,0x34,0x22,0x6A,0x74,0x5C,0x8E};
+  static const char* ascii_fingerprint; // = "99C26CD71A5438BD7A817ACDDDF8C79B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0xC2,0x6C,0xD7,0x1A,0x54,0x38,0xBD,0x7A,0x81,0x7A,0xCD,0xDD,0xF8,0xC7,0x9B};
 
   TFetchResultsResp() : hasMoreRows(0) {
   }

@@ -638,15 +638,15 @@ public class TOpenSessionReq implements org.apache.thrift.TBase<TOpenSessionReq,
           case 4: // CONFIGURATION
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-                org.apache.thrift.protocol.TMap _map142 = iprot.readMapBegin();
-                struct.configuration = new HashMap<String,String>(2*_map142.size);
-                for (int _i143 = 0; _i143 < _map142.size; ++_i143)
+                org.apache.thrift.protocol.TMap _map150 = iprot.readMapBegin();
+                struct.configuration = new HashMap<String,String>(2*_map150.size);
+                for (int _i151 = 0; _i151 < _map150.size; ++_i151)
                 {
-                  String _key144; // required
-                  String _val145; // required
-                  _key144 = iprot.readString();
-                  _val145 = iprot.readString();
-                  struct.configuration.put(_key144, _val145);
+                  String _key152; // required
+                  String _val153; // required
+                  _key152 = iprot.readString();
+                  _val153 = iprot.readString();
+                  struct.configuration.put(_key152, _val153);
                 }
                 iprot.readMapEnd();
               }
@@ -692,10 +692,10 @@ public class TOpenSessionReq implements org.apache.thrift.TBase<TOpenSessionReq,
           oprot.writeFieldBegin(CONFIGURATION_FIELD_DESC);
           {
             oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.configuration.size()));
-            for (Map.Entry<String, String> _iter146 : struct.configuration.entrySet())
+            for (Map.Entry<String, String> _iter154 : struct.configuration.entrySet())
             {
-              oprot.writeString(_iter146.getKey());
-              oprot.writeString(_iter146.getValue());
+              oprot.writeString(_iter154.getKey());
+              oprot.writeString(_iter154.getValue());
             }
             oprot.writeMapEnd();
           }
@@ -740,10 +740,10 @@ public class TOpenSessionReq implements org.apache.thrift.TBase<TOpenSessionReq,
       if (struct.isSetConfiguration()) {
         {
           oprot.writeI32(struct.configuration.size());
-          for (Map.Entry<String, String> _iter147 : struct.configuration.entrySet())
+          for (Map.Entry<String, String> _iter155 : struct.configuration.entrySet())
           {
-            oprot.writeString(_iter147.getKey());
-            oprot.writeString(_iter147.getValue());
+            oprot.writeString(_iter155.getKey());
+            oprot.writeString(_iter155.getValue());
           }
         }
       }
@@ -765,15 +765,15 @@ public class TOpenSessionReq implements org.apache.thrift.TBase<TOpenSessionReq,
       }
       if (incoming.get(2)) {
         {
-          org.apache.thrift.protocol.TMap _map148 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.configuration = new HashMap<String,String>(2*_map148.size);
-          for (int _i149 = 0; _i149 < _map148.size; ++_i149)
+          org.apache.thrift.protocol.TMap _map156 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.configuration = new HashMap<String,String>(2*_map156.size);
+          for (int _i157 = 0; _i157 < _map156.size; ++_i157)
           {
-            String _key150; // required
-            String _val151; // required
-            _key150 = iprot.readString();
-            _val151 = iprot.readString();
-            struct.configuration.put(_key150, _val151);
+            String _key158; // required
+            String _val159; // required
+            _key158 = iprot.readString();
+            _val159 = iprot.readString();
+            struct.configuration.put(_key158, _val159);
           }
         }
         struct.setConfigurationIsSet(true);

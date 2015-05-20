@@ -37,6 +37,8 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
   private static final org.apache.thrift.protocol.TField START_ROW_OFFSET_FIELD_DESC = new org.apache.thrift.protocol.TField("startRowOffset", org.apache.thrift.protocol.TType.I64, (short)1);
   private static final org.apache.thrift.protocol.TField ROWS_FIELD_DESC = new org.apache.thrift.protocol.TField("rows", org.apache.thrift.protocol.TType.LIST, (short)2);
   private static final org.apache.thrift.protocol.TField COLUMNS_FIELD_DESC = new org.apache.thrift.protocol.TField("columns", org.apache.thrift.protocol.TType.LIST, (short)3);
+  private static final org.apache.thrift.protocol.TField EN_COLUMNS_FIELD_DESC = new org.apache.thrift.protocol.TField("enColumns", org.apache.thrift.protocol.TType.LIST, (short)4);
+  private static final org.apache.thrift.protocol.TField COMPRESSOR_BITMAP_FIELD_DESC = new org.apache.thrift.protocol.TField("compressorBitmap", org.apache.thrift.protocol.TType.STRING, (short)5);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -47,12 +49,16 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
   private long startRowOffset; // required
   private List<TRow> rows; // required
   private List<TColumn> columns; // optional
+  private List<TEnColumn> enColumns; // optional
+  private ByteBuffer compressorBitmap; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     START_ROW_OFFSET((short)1, "startRowOffset"),
     ROWS((short)2, "rows"),
-    COLUMNS((short)3, "columns");
+    COLUMNS((short)3, "columns"),
+    EN_COLUMNS((short)4, "enColumns"),
+    COMPRESSOR_BITMAP((short)5, "compressorBitmap");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -73,6 +79,10 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
           return ROWS;
         case 3: // COLUMNS
           return COLUMNS;
+        case 4: // EN_COLUMNS
+          return EN_COLUMNS;
+        case 5: // COMPRESSOR_BITMAP
+          return COMPRESSOR_BITMAP;
         default:
           return null;
       }
@@ -115,7 +125,7 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
   // isset id assignments
   private static final int __STARTROWOFFSET_ISSET_ID = 0;
   private byte __isset_bitfield = 0;
-  private _Fields optionals[] = {_Fields.COLUMNS};
+  private _Fields optionals[] = {_Fields.COLUMNS,_Fields.EN_COLUMNS,_Fields.COMPRESSOR_BITMAP};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -127,6 +137,11 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
     tmpMap.put(_Fields.COLUMNS, new org.apache.thrift.meta_data.FieldMetaData("columns", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TColumn.class))));
+    tmpMap.put(_Fields.EN_COLUMNS, new org.apache.thrift.meta_data.FieldMetaData("enColumns", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+            new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TEnColumn.class))));
+    tmpMap.put(_Fields.COMPRESSOR_BITMAP, new org.apache.thrift.meta_data.FieldMetaData("compressorBitmap", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING        , true)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TRowSet.class, metaDataMap);
   }
@@ -164,6 +179,17 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
       }
       this.columns = __this__columns;
     }
+    if (other.isSetEnColumns()) {
+      List<TEnColumn> __this__enColumns = new ArrayList<TEnColumn>();
+      for (TEnColumn other_element : other.enColumns) {
+        __this__enColumns.add(new TEnColumn(other_element));
+      }
+      this.enColumns = __this__enColumns;
+    }
+    if (other.isSetCompressorBitmap()) {
+      this.compressorBitmap = org.apache.thrift.TBaseHelper.copyBinary(other.compressorBitmap);
+;
+    }
   }
 
   public TRowSet deepCopy() {
@@ -176,6 +202,8 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
     this.startRowOffset = 0;
     this.rows = null;
     this.columns = null;
+    this.enColumns = null;
+    this.compressorBitmap = null;
   }
 
   public long getStartRowOffset() {
@@ -276,6 +304,76 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
     }
   }
 
+  public int getEnColumnsSize() {
+    return (this.enColumns == null) ? 0 : this.enColumns.size();
+  }
+
+  public java.util.Iterator<TEnColumn> getEnColumnsIterator() {
+    return (this.enColumns == null) ? null : this.enColumns.iterator();
+  }
+
+  public void addToEnColumns(TEnColumn elem) {
+    if (this.enColumns == null) {
+      this.enColumns = new ArrayList<TEnColumn>();
+    }
+    this.enColumns.add(elem);
+  }
+
+  public List<TEnColumn> getEnColumns() {
+    return this.enColumns;
+  }
+
+  public void setEnColumns(List<TEnColumn> enColumns) {
+    this.enColumns = enColumns;
+  }
+
+  public void unsetEnColumns() {
+    this.enColumns = null;
+  }
+
+  /** Returns true if field enColumns is set (has been assigned a value) and false otherwise */
+  public boolean isSetEnColumns() {
+    return this.enColumns != null;
+  }
+
+  public void setEnColumnsIsSet(boolean value) {
+    if (!value) {
+      this.enColumns = null;
+    }
+  }
+
+  public byte[] getCompressorBitmap() {
+    setCompressorBitmap(org.apache.thrift.TBaseHelper.rightSize(compressorBitmap));
+    return compressorBitmap == null ? null : compressorBitmap.array();
+  }
+
+  public ByteBuffer bufferForCompressorBitmap() {
+    return compressorBitmap;
+  }
+
+  public void setCompressorBitmap(byte[] compressorBitmap) {
+    setCompressorBitmap(compressorBitmap == null ? (ByteBuffer)null : ByteBuffer.wrap(compressorBitmap));
+  }
+
+  public void setCompressorBitmap(ByteBuffer compressorBitmap) {
+    this.compressorBitmap = compressorBitmap;
+  }
+
+  public void unsetCompressorBitmap() {
+    this.compressorBitmap = null;
+  }
+
+  /** Returns true if field compressorBitmap is set (has been assigned a value) and false otherwise */
+  public boolean isSetCompressorBitmap() {
+    return this.compressorBitmap != null;
+  }
+
+  public void setCompressorBitmapIsSet(boolean value) {
+    if (!value) {
+      this.compressorBitmap = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case START_ROW_OFFSET:
@@ -302,6 +400,22 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
       }
       break;
 
+    case EN_COLUMNS:
+      if (value == null) {
+        unsetEnColumns();
+      } else {
+        setEnColumns((List<TEnColumn>)value);
+      }
+      break;
+
+    case COMPRESSOR_BITMAP:
+      if (value == null) {
+        unsetCompressorBitmap();
+      } else {
+        setCompressorBitmap((ByteBuffer)value);
+      }
+      break;
+
     }
   }
 
@@ -315,6 +429,12 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
 
     case COLUMNS:
       return getColumns();
+
+    case EN_COLUMNS:
+      return getEnColumns();
+
+    case COMPRESSOR_BITMAP:
+      return getCompressorBitmap();
 
     }
     throw new IllegalStateException();
@@ -333,6 +453,10 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
       return isSetRows();
     case COLUMNS:
       return isSetColumns();
+    case EN_COLUMNS:
+      return isSetEnColumns();
+    case COMPRESSOR_BITMAP:
+      return isSetCompressorBitmap();
     }
     throw new IllegalStateException();
   }
@@ -377,6 +501,24 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
         return false;
     }
 
+    boolean this_present_enColumns = true && this.isSetEnColumns();
+    boolean that_present_enColumns = true && that.isSetEnColumns();
+    if (this_present_enColumns || that_present_enColumns) {
+      if (!(this_present_enColumns && that_present_enColumns))
+        return false;
+      if (!this.enColumns.equals(that.enColumns))
+        return false;
+    }
+
+    boolean this_present_compressorBitmap = true && this.isSetCompressorBitmap();
+    boolean that_present_compressorBitmap = true && that.isSetCompressorBitmap();
+    if (this_present_compressorBitmap || that_present_compressorBitmap) {
+      if (!(this_present_compressorBitmap && that_present_compressorBitmap))
+        return false;
+      if (!this.compressorBitmap.equals(that.compressorBitmap))
+        return false;
+    }
+
     return true;
   }
 
@@ -398,6 +540,16 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
     builder.append(present_columns);
     if (present_columns)
       builder.append(columns);
+
+    boolean present_enColumns = true && (isSetEnColumns());
+    builder.append(present_enColumns);
+    if (present_enColumns)
+      builder.append(enColumns);
+
+    boolean present_compressorBitmap = true && (isSetCompressorBitmap());
+    builder.append(present_compressorBitmap);
+    if (present_compressorBitmap)
+      builder.append(compressorBitmap);
 
     return builder.toHashCode();
   }
@@ -440,6 +592,26 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetEnColumns()).compareTo(typedOther.isSetEnColumns());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetEnColumns()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.enColumns, typedOther.enColumns);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCompressorBitmap()).compareTo(typedOther.isSetCompressorBitmap());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetCompressorBitmap()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.compressorBitmap, typedOther.compressorBitmap);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -478,6 +650,26 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
         sb.append("null");
       } else {
         sb.append(this.columns);
+      }
+      first = false;
+    }
+    if (isSetEnColumns()) {
+      if (!first) sb.append(", ");
+      sb.append("enColumns:");
+      if (this.enColumns == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.enColumns);
+      }
+      first = false;
+    }
+    if (isSetCompressorBitmap()) {
+      if (!first) sb.append(", ");
+      sb.append("compressorBitmap:");
+      if (this.compressorBitmap == null) {
+        sb.append("null");
+      } else {
+        org.apache.thrift.TBaseHelper.toString(this.compressorBitmap, sb);
       }
       first = false;
     }
@@ -549,7 +741,7 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
                 struct.rows = new ArrayList<TRow>(_list118.size);
                 for (int _i119 = 0; _i119 < _list118.size; ++_i119)
                 {
-                  TRow _elem120; // optional
+                  TRow _elem120; // required
                   _elem120 = new TRow();
                   _elem120.read(iprot);
                   struct.rows.add(_elem120);
@@ -568,7 +760,7 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
                 struct.columns = new ArrayList<TColumn>(_list121.size);
                 for (int _i122 = 0; _i122 < _list121.size; ++_i122)
                 {
-                  TColumn _elem123; // optional
+                  TColumn _elem123; // required
                   _elem123 = new TColumn();
                   _elem123.read(iprot);
                   struct.columns.add(_elem123);
@@ -576,6 +768,33 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
                 iprot.readListEnd();
               }
               struct.setColumnsIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 4: // EN_COLUMNS
+            if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+              {
+                org.apache.thrift.protocol.TList _list124 = iprot.readListBegin();
+                struct.enColumns = new ArrayList<TEnColumn>(_list124.size);
+                for (int _i125 = 0; _i125 < _list124.size; ++_i125)
+                {
+                  TEnColumn _elem126; // required
+                  _elem126 = new TEnColumn();
+                  _elem126.read(iprot);
+                  struct.enColumns.add(_elem126);
+                }
+                iprot.readListEnd();
+              }
+              struct.setEnColumnsIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 5: // COMPRESSOR_BITMAP
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.compressorBitmap = iprot.readBinary();
+              struct.setCompressorBitmapIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -600,9 +819,9 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
         oprot.writeFieldBegin(ROWS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.rows.size()));
-          for (TRow _iter124 : struct.rows)
+          for (TRow _iter127 : struct.rows)
           {
-            _iter124.write(oprot);
+            _iter127.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -613,12 +832,33 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
           oprot.writeFieldBegin(COLUMNS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.columns.size()));
-            for (TColumn _iter125 : struct.columns)
+            for (TColumn _iter128 : struct.columns)
             {
-              _iter125.write(oprot);
+              _iter128.write(oprot);
             }
             oprot.writeListEnd();
           }
+          oprot.writeFieldEnd();
+        }
+      }
+      if (struct.enColumns != null) {
+        if (struct.isSetEnColumns()) {
+          oprot.writeFieldBegin(EN_COLUMNS_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.enColumns.size()));
+            for (TEnColumn _iter129 : struct.enColumns)
+            {
+              _iter129.write(oprot);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+      }
+      if (struct.compressorBitmap != null) {
+        if (struct.isSetCompressorBitmap()) {
+          oprot.writeFieldBegin(COMPRESSOR_BITMAP_FIELD_DESC);
+          oprot.writeBinary(struct.compressorBitmap);
           oprot.writeFieldEnd();
         }
       }
@@ -642,24 +882,42 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
       oprot.writeI64(struct.startRowOffset);
       {
         oprot.writeI32(struct.rows.size());
-        for (TRow _iter126 : struct.rows)
+        for (TRow _iter130 : struct.rows)
         {
-          _iter126.write(oprot);
+          _iter130.write(oprot);
         }
       }
       BitSet optionals = new BitSet();
       if (struct.isSetColumns()) {
         optionals.set(0);
       }
-      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetEnColumns()) {
+        optionals.set(1);
+      }
+      if (struct.isSetCompressorBitmap()) {
+        optionals.set(2);
+      }
+      oprot.writeBitSet(optionals, 3);
       if (struct.isSetColumns()) {
         {
           oprot.writeI32(struct.columns.size());
-          for (TColumn _iter127 : struct.columns)
+          for (TColumn _iter131 : struct.columns)
           {
-            _iter127.write(oprot);
+            _iter131.write(oprot);
           }
         }
+      }
+      if (struct.isSetEnColumns()) {
+        {
+          oprot.writeI32(struct.enColumns.size());
+          for (TEnColumn _iter132 : struct.enColumns)
+          {
+            _iter132.write(oprot);
+          }
+        }
+      }
+      if (struct.isSetCompressorBitmap()) {
+        oprot.writeBinary(struct.compressorBitmap);
       }
     }
 
@@ -669,31 +927,49 @@ public class TRowSet implements org.apache.thrift.TBase<TRowSet, TRowSet._Fields
       struct.startRowOffset = iprot.readI64();
       struct.setStartRowOffsetIsSet(true);
       {
-        org.apache.thrift.protocol.TList _list128 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.rows = new ArrayList<TRow>(_list128.size);
-        for (int _i129 = 0; _i129 < _list128.size; ++_i129)
+        org.apache.thrift.protocol.TList _list133 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.rows = new ArrayList<TRow>(_list133.size);
+        for (int _i134 = 0; _i134 < _list133.size; ++_i134)
         {
-          TRow _elem130; // optional
-          _elem130 = new TRow();
-          _elem130.read(iprot);
-          struct.rows.add(_elem130);
+          TRow _elem135; // required
+          _elem135 = new TRow();
+          _elem135.read(iprot);
+          struct.rows.add(_elem135);
         }
       }
       struct.setRowsIsSet(true);
-      BitSet incoming = iprot.readBitSet(1);
+      BitSet incoming = iprot.readBitSet(3);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list131 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.columns = new ArrayList<TColumn>(_list131.size);
-          for (int _i132 = 0; _i132 < _list131.size; ++_i132)
+          org.apache.thrift.protocol.TList _list136 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.columns = new ArrayList<TColumn>(_list136.size);
+          for (int _i137 = 0; _i137 < _list136.size; ++_i137)
           {
-            TColumn _elem133; // optional
-            _elem133 = new TColumn();
-            _elem133.read(iprot);
-            struct.columns.add(_elem133);
+            TColumn _elem138; // required
+            _elem138 = new TColumn();
+            _elem138.read(iprot);
+            struct.columns.add(_elem138);
           }
         }
         struct.setColumnsIsSet(true);
+      }
+      if (incoming.get(1)) {
+        {
+          org.apache.thrift.protocol.TList _list139 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.enColumns = new ArrayList<TEnColumn>(_list139.size);
+          for (int _i140 = 0; _i140 < _list139.size; ++_i140)
+          {
+            TEnColumn _elem141; // required
+            _elem141 = new TEnColumn();
+            _elem141.read(iprot);
+            struct.enColumns.add(_elem141);
+          }
+        }
+        struct.setEnColumnsIsSet(true);
+      }
+      if (incoming.get(2)) {
+        struct.compressorBitmap = iprot.readBinary();
+        struct.setCompressorBitmapIsSet(true);
       }
     }
   }

@@ -25,6 +25,7 @@ class TProtocolVersion:
   HIVE_CLI_SERVICE_PROTOCOL_V6 = 5
   HIVE_CLI_SERVICE_PROTOCOL_V7 = 6
   HIVE_CLI_SERVICE_PROTOCOL_V8 = 7
+  HIVE_CLI_SERVICE_PROTOCOL_V9 = 8
 
   _VALUES_TO_NAMES = {
     0: "HIVE_CLI_SERVICE_PROTOCOL_V1",
@@ -35,6 +36,7 @@ class TProtocolVersion:
     5: "HIVE_CLI_SERVICE_PROTOCOL_V6",
     6: "HIVE_CLI_SERVICE_PROTOCOL_V7",
     7: "HIVE_CLI_SERVICE_PROTOCOL_V8",
+    8: "HIVE_CLI_SERVICE_PROTOCOL_V9",
   }
 
   _NAMES_TO_VALUES = {
@@ -46,6 +48,7 @@ class TProtocolVersion:
     "HIVE_CLI_SERVICE_PROTOCOL_V6": 5,
     "HIVE_CLI_SERVICE_PROTOCOL_V7": 6,
     "HIVE_CLI_SERVICE_PROTOCOL_V8": 7,
+    "HIVE_CLI_SERVICE_PROTOCOL_V9": 8,
   }
 
 class TTypeId:
@@ -2777,12 +2780,132 @@ class TColumn:
   def __ne__(self, other):
     return not (self == other)
 
+class TEnColumn:
+  """
+  Attributes:
+   - enData
+   - nulls
+   - type
+   - size
+   - compressorName
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'enData', None, None, ), # 1
+    (2, TType.STRING, 'nulls', None, None, ), # 2
+    (3, TType.I32, 'type', None, None, ), # 3
+    (4, TType.I32, 'size', None, None, ), # 4
+    (5, TType.STRING, 'compressorName', None, None, ), # 5
+  )
+
+  def __init__(self, enData=None, nulls=None, type=None, size=None, compressorName=None,):
+    self.enData = enData
+    self.nulls = nulls
+    self.type = type
+    self.size = size
+    self.compressorName = compressorName
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.enData = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.nulls = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.I32:
+          self.type = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.I32:
+          self.size = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.STRING:
+          self.compressorName = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TEnColumn')
+    if self.enData is not None:
+      oprot.writeFieldBegin('enData', TType.STRING, 1)
+      oprot.writeString(self.enData)
+      oprot.writeFieldEnd()
+    if self.nulls is not None:
+      oprot.writeFieldBegin('nulls', TType.STRING, 2)
+      oprot.writeString(self.nulls)
+      oprot.writeFieldEnd()
+    if self.type is not None:
+      oprot.writeFieldBegin('type', TType.I32, 3)
+      oprot.writeI32(self.type)
+      oprot.writeFieldEnd()
+    if self.size is not None:
+      oprot.writeFieldBegin('size', TType.I32, 4)
+      oprot.writeI32(self.size)
+      oprot.writeFieldEnd()
+    if self.compressorName is not None:
+      oprot.writeFieldBegin('compressorName', TType.STRING, 5)
+      oprot.writeString(self.compressorName)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.enData is None:
+      raise TProtocol.TProtocolException(message='Required field enData is unset!')
+    if self.nulls is None:
+      raise TProtocol.TProtocolException(message='Required field nulls is unset!')
+    if self.type is None:
+      raise TProtocol.TProtocolException(message='Required field type is unset!')
+    if self.size is None:
+      raise TProtocol.TProtocolException(message='Required field size is unset!')
+    if self.compressorName is None:
+      raise TProtocol.TProtocolException(message='Required field compressorName is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
 class TRowSet:
   """
   Attributes:
    - startRowOffset
    - rows
    - columns
+   - enColumns
+   - compressorBitmap
   """
 
   thrift_spec = (
@@ -2790,12 +2913,16 @@ class TRowSet:
     (1, TType.I64, 'startRowOffset', None, None, ), # 1
     (2, TType.LIST, 'rows', (TType.STRUCT,(TRow, TRow.thrift_spec)), None, ), # 2
     (3, TType.LIST, 'columns', (TType.STRUCT,(TColumn, TColumn.thrift_spec)), None, ), # 3
+    (4, TType.LIST, 'enColumns', (TType.STRUCT,(TEnColumn, TEnColumn.thrift_spec)), None, ), # 4
+    (5, TType.STRING, 'compressorBitmap', None, None, ), # 5
   )
 
-  def __init__(self, startRowOffset=None, rows=None, columns=None,):
+  def __init__(self, startRowOffset=None, rows=None, columns=None, enColumns=None, compressorBitmap=None,):
     self.startRowOffset = startRowOffset
     self.rows = rows
     self.columns = columns
+    self.enColumns = enColumns
+    self.compressorBitmap = compressorBitmap
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -2833,6 +2960,22 @@ class TRowSet:
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.LIST:
+          self.enColumns = []
+          (_etype119, _size116) = iprot.readListBegin()
+          for _i120 in xrange(_size116):
+            _elem121 = TEnColumn()
+            _elem121.read(iprot)
+            self.enColumns.append(_elem121)
+          iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.STRING:
+          self.compressorBitmap = iprot.readString();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -2850,16 +2993,27 @@ class TRowSet:
     if self.rows is not None:
       oprot.writeFieldBegin('rows', TType.LIST, 2)
       oprot.writeListBegin(TType.STRUCT, len(self.rows))
-      for iter116 in self.rows:
-        iter116.write(oprot)
+      for iter122 in self.rows:
+        iter122.write(oprot)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.columns is not None:
       oprot.writeFieldBegin('columns', TType.LIST, 3)
       oprot.writeListBegin(TType.STRUCT, len(self.columns))
-      for iter117 in self.columns:
-        iter117.write(oprot)
+      for iter123 in self.columns:
+        iter123.write(oprot)
       oprot.writeListEnd()
+      oprot.writeFieldEnd()
+    if self.enColumns is not None:
+      oprot.writeFieldBegin('enColumns', TType.LIST, 4)
+      oprot.writeListBegin(TType.STRUCT, len(self.enColumns))
+      for iter124 in self.enColumns:
+        iter124.write(oprot)
+      oprot.writeListEnd()
+      oprot.writeFieldEnd()
+    if self.compressorBitmap is not None:
+      oprot.writeFieldBegin('compressorBitmap', TType.STRING, 5)
+      oprot.writeString(self.compressorBitmap)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -2926,10 +3080,10 @@ class TStatus:
       elif fid == 2:
         if ftype == TType.LIST:
           self.infoMessages = []
-          (_etype121, _size118) = iprot.readListBegin()
-          for _i122 in xrange(_size118):
-            _elem123 = iprot.readString();
-            self.infoMessages.append(_elem123)
+          (_etype128, _size125) = iprot.readListBegin()
+          for _i129 in xrange(_size125):
+            _elem130 = iprot.readString();
+            self.infoMessages.append(_elem130)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -2965,8 +3119,8 @@ class TStatus:
     if self.infoMessages is not None:
       oprot.writeFieldBegin('infoMessages', TType.LIST, 2)
       oprot.writeListBegin(TType.STRING, len(self.infoMessages))
-      for iter124 in self.infoMessages:
-        oprot.writeString(iter124)
+      for iter131 in self.infoMessages:
+        oprot.writeString(iter131)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     if self.sqlState is not None:
@@ -3293,11 +3447,11 @@ class TOpenSessionReq:
       elif fid == 4:
         if ftype == TType.MAP:
           self.configuration = {}
-          (_ktype126, _vtype127, _size125 ) = iprot.readMapBegin() 
-          for _i129 in xrange(_size125):
-            _key130 = iprot.readString();
-            _val131 = iprot.readString();
-            self.configuration[_key130] = _val131
+          (_ktype133, _vtype134, _size132 ) = iprot.readMapBegin() 
+          for _i136 in xrange(_size132):
+            _key137 = iprot.readString();
+            _val138 = iprot.readString();
+            self.configuration[_key137] = _val138
           iprot.readMapEnd()
         else:
           iprot.skip(ftype)
@@ -3326,9 +3480,9 @@ class TOpenSessionReq:
     if self.configuration is not None:
       oprot.writeFieldBegin('configuration', TType.MAP, 4)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.configuration))
-      for kiter132,viter133 in self.configuration.items():
-        oprot.writeString(kiter132)
-        oprot.writeString(viter133)
+      for kiter139,viter140 in self.configuration.items():
+        oprot.writeString(kiter139)
+        oprot.writeString(viter140)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -3403,11 +3557,11 @@ class TOpenSessionResp:
       elif fid == 4:
         if ftype == TType.MAP:
           self.configuration = {}
-          (_ktype135, _vtype136, _size134 ) = iprot.readMapBegin() 
-          for _i138 in xrange(_size134):
-            _key139 = iprot.readString();
-            _val140 = iprot.readString();
-            self.configuration[_key139] = _val140
+          (_ktype142, _vtype143, _size141 ) = iprot.readMapBegin() 
+          for _i145 in xrange(_size141):
+            _key146 = iprot.readString();
+            _val147 = iprot.readString();
+            self.configuration[_key146] = _val147
           iprot.readMapEnd()
         else:
           iprot.skip(ftype)
@@ -3436,9 +3590,9 @@ class TOpenSessionResp:
     if self.configuration is not None:
       oprot.writeFieldBegin('configuration', TType.MAP, 4)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.configuration))
-      for kiter141,viter142 in self.configuration.items():
-        oprot.writeString(kiter141)
-        oprot.writeString(viter142)
+      for kiter148,viter149 in self.configuration.items():
+        oprot.writeString(kiter148)
+        oprot.writeString(viter149)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -3910,11 +4064,11 @@ class TExecuteStatementReq:
       elif fid == 3:
         if ftype == TType.MAP:
           self.confOverlay = {}
-          (_ktype144, _vtype145, _size143 ) = iprot.readMapBegin() 
-          for _i147 in xrange(_size143):
-            _key148 = iprot.readString();
-            _val149 = iprot.readString();
-            self.confOverlay[_key148] = _val149
+          (_ktype151, _vtype152, _size150 ) = iprot.readMapBegin() 
+          for _i154 in xrange(_size150):
+            _key155 = iprot.readString();
+            _val156 = iprot.readString();
+            self.confOverlay[_key155] = _val156
           iprot.readMapEnd()
         else:
           iprot.skip(ftype)
@@ -3944,9 +4098,9 @@ class TExecuteStatementReq:
     if self.confOverlay is not None:
       oprot.writeFieldBegin('confOverlay', TType.MAP, 3)
       oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.confOverlay))
-      for kiter150,viter151 in self.confOverlay.items():
-        oprot.writeString(kiter150)
-        oprot.writeString(viter151)
+      for kiter157,viter158 in self.confOverlay.items():
+        oprot.writeString(kiter157)
+        oprot.writeString(viter158)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
     if self.runAsync is not None:
@@ -4551,10 +4705,10 @@ class TGetTablesReq:
       elif fid == 5:
         if ftype == TType.LIST:
           self.tableTypes = []
-          (_etype155, _size152) = iprot.readListBegin()
-          for _i156 in xrange(_size152):
-            _elem157 = iprot.readString();
-            self.tableTypes.append(_elem157)
+          (_etype162, _size159) = iprot.readListBegin()
+          for _i163 in xrange(_size159):
+            _elem164 = iprot.readString();
+            self.tableTypes.append(_elem164)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -4587,8 +4741,8 @@ class TGetTablesReq:
     if self.tableTypes is not None:
       oprot.writeFieldBegin('tableTypes', TType.LIST, 5)
       oprot.writeListBegin(TType.STRING, len(self.tableTypes))
-      for iter158 in self.tableTypes:
-        oprot.writeString(iter158)
+      for iter165 in self.tableTypes:
+        oprot.writeString(iter165)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()

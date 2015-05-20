@@ -2195,8 +2195,14 @@ public class HiveConf extends Configuration {
         new StringSet("throw", "skip", "ignore"), "The approach msck should take with HDFS " +
        "directories that are partition-like but contain unsupported characters. 'throw' (an " +
        "exception) is the default; 'skip' will skip the invalid directories and still repair the" +
-       " others; 'ignore' will skip the validation (legacy behavior, causes bugs in many cases)");
+       " others; 'ignore' will skip the validation (legacy behavior, causes bugs in many cases)"),
 
+    // Hiveserver2 resultset compression configurations
+    HIVE_RESULTSET_COMPRESSION_DISABLED_COMPRESSORS("hive.resultset.compression.disabled.compressors", "",
+    		"Set a list of disabled resultset compressors"),
+    HIVE_RESULTSET_COMPRESSION_ENABLED("hive.resultset.compression.enabled", true,
+    		"Whether to enable resultset compression"),
+    ;
 
     public final String varname;
     private final String defaultExpr;

@@ -711,13 +711,13 @@ public class TGetTablesReq implements org.apache.thrift.TBase<TGetTablesReq, TGe
           case 5: // TABLE_TYPES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list172 = iprot.readListBegin();
-                struct.tableTypes = new ArrayList<String>(_list172.size);
-                for (int _i173 = 0; _i173 < _list172.size; ++_i173)
+                org.apache.thrift.protocol.TList _list180 = iprot.readListBegin();
+                struct.tableTypes = new ArrayList<String>(_list180.size);
+                for (int _i181 = 0; _i181 < _list180.size; ++_i181)
                 {
-                  String _elem174; // optional
-                  _elem174 = iprot.readString();
-                  struct.tableTypes.add(_elem174);
+                  String _elem182; // required
+                  _elem182 = iprot.readString();
+                  struct.tableTypes.add(_elem182);
                 }
                 iprot.readListEnd();
               }
@@ -770,9 +770,9 @@ public class TGetTablesReq implements org.apache.thrift.TBase<TGetTablesReq, TGe
           oprot.writeFieldBegin(TABLE_TYPES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.tableTypes.size()));
-            for (String _iter175 : struct.tableTypes)
+            for (String _iter183 : struct.tableTypes)
             {
-              oprot.writeString(_iter175);
+              oprot.writeString(_iter183);
             }
             oprot.writeListEnd();
           }
@@ -823,9 +823,9 @@ public class TGetTablesReq implements org.apache.thrift.TBase<TGetTablesReq, TGe
       if (struct.isSetTableTypes()) {
         {
           oprot.writeI32(struct.tableTypes.size());
-          for (String _iter176 : struct.tableTypes)
+          for (String _iter184 : struct.tableTypes)
           {
-            oprot.writeString(_iter176);
+            oprot.writeString(_iter184);
           }
         }
       }
@@ -852,13 +852,13 @@ public class TGetTablesReq implements org.apache.thrift.TBase<TGetTablesReq, TGe
       }
       if (incoming.get(3)) {
         {
-          org.apache.thrift.protocol.TList _list177 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.tableTypes = new ArrayList<String>(_list177.size);
-          for (int _i178 = 0; _i178 < _list177.size; ++_i178)
+          org.apache.thrift.protocol.TList _list185 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.tableTypes = new ArrayList<String>(_list185.size);
+          for (int _i186 = 0; _i186 < _list185.size; ++_i186)
           {
-            String _elem179; // optional
-            _elem179 = iprot.readString();
-            struct.tableTypes.add(_elem179);
+            String _elem187; // required
+            _elem187 = iprot.readString();
+            struct.tableTypes.add(_elem187);
           }
         }
         struct.setTableTypesIsSet(true);
