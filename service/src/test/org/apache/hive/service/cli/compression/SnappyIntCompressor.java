@@ -1,9 +1,9 @@
-package org.apache.hive.service.resultset.compression;
+package org.apache.hive.service.cli.compression;
 
 import java.io.IOException;
 
 import org.apache.hive.service.cli.Column;
-import org.apache.hive.service.resultset.compression.ColumnCompressor;
+import org.apache.hive.service.cli.compression.ColumnCompressor;
 import org.xerial.snappy.Snappy;
 
 public class SnappyIntCompressor implements ColumnCompressor {

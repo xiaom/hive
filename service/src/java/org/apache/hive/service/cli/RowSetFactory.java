@@ -18,6 +18,7 @@
 
 package org.apache.hive.service.cli;
 
+import org.apache.hive.service.cli.compression.EncodedColumnBasedSet;
 import org.apache.hive.service.cli.thrift.TProtocolVersion;
 import org.apache.hive.service.cli.thrift.TRowSet;
 

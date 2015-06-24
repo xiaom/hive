@@ -1,4 +1,4 @@
-package org.apache.hive.service.resultset.compression;
+package org.apache.hive.service.cli.compression;
 
 import java.util.Hashtable;
 import java.util.Iterator;

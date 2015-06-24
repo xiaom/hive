@@ -1,10 +1,10 @@
-package org.apache.hive.service.resultset.compression;
+package org.apache.hive.service.cli.compression;
 
 import static org.junit.Assert.*;
 import java.io.IOException;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hive.service.cli.Column;
-import org.apache.hive.service.cli.EncodedColumnBasedSet;
+import org.apache.hive.service.cli.compression.EncodedColumnBasedSet;
 import org.apache.hive.service.cli.Type;
 import org.apache.hive.service.cli.thrift.TRowSet;
 import org.json.JSONException;

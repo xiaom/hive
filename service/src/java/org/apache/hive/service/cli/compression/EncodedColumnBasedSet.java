@@ -1,4 +1,4 @@
-package org.apache.hive.service.cli;
+package org.apache.hive.service.cli.compression;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,12 +7,14 @@ import java.util.List;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hive.service.cli.Column;
+import org.apache.hive.service.cli.ColumnBasedSet;
+import org.apache.hive.service.cli.TableSchema;
+import org.apache.hive.service.cli.Type;
 import org.apache.hive.service.cli.thrift.TColumn;
 import org.apache.hive.service.cli.thrift.TEnColumn;
 import org.apache.hive.service.cli.thrift.TRowSet;
 import org.apache.hive.service.cli.thrift.TRow;
-import org.apache.hive.service.resultset.compression.ColumnCompressor;
-import org.apache.hive.service.resultset.compression.ColumnCompressorService;
 import org.json.JSONException;
 import org.json.JSONObject;
 

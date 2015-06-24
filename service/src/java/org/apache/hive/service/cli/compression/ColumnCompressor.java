@@ -1,4 +1,4 @@
-package org.apache.hive.service.resultset.compression;
+package org.apache.hive.service.cli.compression;
 
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
