@@ -29,7 +29,7 @@ public class ColumnCompressorService {
             compressor.getClass());
       }
     }
-     return service;
+    return service;
   }
 
   /**

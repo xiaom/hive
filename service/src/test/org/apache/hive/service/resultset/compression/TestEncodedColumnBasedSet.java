@@ -1,4 +1,4 @@
-package org.apache.hive.service.cli;
+package org.apache.hive.service.resultset.compression;
 
 import static org.junit.Assert.*;
 
@@ -8,7 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hive.service.cli.pluginsnappy.TestSnappyPlugin;
+import org.apache.hive.service.cli.Column;
+import org.apache.hive.service.cli.EncodedColumnBasedSet;
+import org.apache.hive.service.cli.Type;
 import org.apache.hive.service.cli.thrift.TEnColumn;
 import org.apache.hive.service.cli.thrift.TRowSet;
 import org.apache.hive.service.cli.thrift.TTypeId;
@@ -61,7 +63,7 @@ public class TestEncodedColumnBasedSet {
 		TRowSet compressed = ecbs.toTRowSet();
 		assertEquals(ecbs.getColumns().size(), 1);
 		byte[] compressedData = compressed.getEnColumns().get(0).getEnData();
-		assertArrayEquals(TestSnappyPlugin.decompress(compressedData), new int[]{0, 1, 2});	
+		assertArrayEquals(SnappyIntCompressor.decompress(compressedData), new int[]{0, 1, 2});	
 	}
 	
 	@Test

@@ -34,11 +34,7 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
    */
 
   private HiveConf hiveConf;
-  private boolean isCompression; //flag to indicate if compression is happening or not. depends on CompressorInfo, and 
-  //the settings in hive-site.xml
-  
-  private String compressorInfo;
-  
+
   /*
    * Compressors that shouldn't be used specified as csv under
    * "hive.resultset.compression.disabled.compressors".
@@ -49,7 +45,6 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
     super(schema);
   }
 
-  
   public EncodedColumnBasedSet(TRowSet tRowSet) {
     super(tRowSet);
   }
@@ -81,20 +76,9 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
    * class and the compressor is not part of the disable compressorList (referred to above).
    *
    */
-  /*
-  private void setCompressorInfo(String s) {
-	  compressorInfo = s;
-  }
-  
-  public String getCompressorInfo() {
-	  return compressorInfo;
-  }
-  */
-  
   @Override
   public TRowSet toTRowSet() {
-    //System.out.println(hiveConf.get("CompressorInfo"));
-	//setCompressorInfo(hiveConf.get("CompressorInfo"));
+
     if (hiveConf == null) {
       throw new IllegalStateException("Hive configuration from session not set");
     }
@@ -116,7 +100,6 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
       }
       if (compressorInfoJSON != null) {
         for (int i = 0; i < columns.size(); i++) {
-          isCompression = true;
           // Add this column, possibly compressed, to the row set.
           addColumn(tRowSet, i, compressorInfoJSON, compressorBitmap);
         }

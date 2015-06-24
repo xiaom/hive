@@ -1,4 +1,4 @@
-package org.apache.hive.service.cli.pluginsnappy;
+package org.apache.hive.service.resultset.compression;
 
 import java.io.IOException;
 
@@ -6,7 +6,7 @@ import org.apache.hive.service.cli.Column;
 import org.apache.hive.service.resultset.compression.ColumnCompressor;
 import org.xerial.snappy.Snappy;
 
-public class TestSnappyPlugin implements ColumnCompressor {
+public class SnappyIntCompressor implements ColumnCompressor {
 
 	/**
 	   * Before calling the compress() method below, should check if the column is compressable by any

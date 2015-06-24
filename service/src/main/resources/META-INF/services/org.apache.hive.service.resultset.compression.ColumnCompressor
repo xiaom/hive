@@ -1,1 +1,1 @@
-org.apache.hive.service.cli.pluginsnappy.TestSnappyPlugin
+org.apache.hive.service.resultset.compression.SnappyIntCompressor
