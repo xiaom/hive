@@ -1,7 +1,8 @@
-package org.apache.hive.service.cli;
+package org.apache.hive.service.resultset.compression;
 
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
+import org.apache.hive.service.cli.Column;
 
 
 @InterfaceAudience.Private

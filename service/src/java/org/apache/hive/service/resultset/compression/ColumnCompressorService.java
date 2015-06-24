@@ -1,4 +1,4 @@
-package org.apache.hive.service.cli;
+package org.apache.hive.service.resultset.compression;
 
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -29,7 +29,7 @@ public class ColumnCompressorService {
             compressor.getClass());
       }
     }
-    return service;
+     return service;
   }
 
   /**
