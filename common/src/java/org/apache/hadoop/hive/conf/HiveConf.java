@@ -2198,10 +2198,9 @@ public class HiveConf extends Configuration {
        " others; 'ignore' will skip the validation (legacy behavior, causes bugs in many cases)"),
 
     // Hiveserver2 resultset compression configurations
-    HIVE_RESULTSET_COMPRESSION_DISABLED_COMPRESSORS("hive.resultset.compression.disabled.compressors", "",
-    		"Set a list of disabled resultset compressors"),
-    HIVE_RESULTSET_COMPRESSION_ENABLED("hive.resultset.compression.enabled", true,
-    		"Whether to enable resultset compression"),
+    HIVE_RESULTSET_COMPRESSION_DISABLED_COMPRESSORS("hive.resultset.compression.disabled.compressors",
+        "", "list of disabled resultset compressors"),
+    HIVE_RESULTSET_COMPRESSION_ENABLED("hive.resultset.compression.enabled", false, "Whether to enable resultset compression"),
     ;
 
     public final String varname;
