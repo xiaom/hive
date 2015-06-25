@@ -17,37 +17,33 @@ import org.junit.Test;
  */
 public class TestEncodedColumnBasedSet {
 
-  private static TRowSet testTRowSet;
-  private static Column testColumn;
-  private static EncodedColumnBasedSet ecbs;
+  private TRowSet testTRowSet;
   private static HiveConf hiveConf = new HiveConf();
-  private static JSONObject info;
-  private static JSONObject stringJSON;
 
   @Before
   public void setUp() throws JSONException {
     // create a TRowSet with one Column, which is of type INT. and has
-    // values {0, 1, 2}. and
+    // values {0, 1, 2}.
     testTRowSet = new TRowSet();
     testTRowSet.setStartRowOffset((long) 0);
-    testColumn = new Column(Type.INT_TYPE);
-    info = new JSONObject();
-    stringJSON = new JSONObject();
-    testColumn.addValue(Type.INT_TYPE, 0);
-    testColumn.addValue(Type.INT_TYPE, 1);
-    testColumn.addValue(Type.INT_TYPE, 2);
-    testTRowSet.addToColumns(testColumn.toTColumn());
+    Column column = new Column(Type.INT_TYPE);
+    column.addValue(Type.INT_TYPE, 0);
+    column.addValue(Type.INT_TYPE, 1);
+    column.addValue(Type.INT_TYPE, 2);
+    testTRowSet.addToColumns(column.toTColumn());
   }
 
   @Test
-  public void positive() throws IOException, JSONException {
+  public void testCompressionUsingSnappy() throws IOException, JSONException {
     // send the right information as part of compressorInfo.
     // EncodedColumnBasedSet should compress the data.
-    info.put("vendor", "org.apache.hive.service.cli");
-    info.put("compressorSet", "pluginsnappy");
-    stringJSON.put("INT_TYPE", info);
-    hiveConf.set("CompressorInfo", stringJSON.toString());
-    ecbs = new EncodedColumnBasedSet(testTRowSet);
+    JSONObject temp = new JSONObject();
+    temp.put("vendor", "snappy");
+    temp.put("compressorSet", "snappy");
+    JSONObject compressorInfo = new JSONObject();
+    compressorInfo.put("INT_TYPE", temp);
+    hiveConf.set("CompressorInfo", compressorInfo.toString());
+    EncodedColumnBasedSet ecbs = new EncodedColumnBasedSet(testTRowSet);
     ecbs.setConf(hiveConf);
     TRowSet compressed = ecbs.toTRowSet();
     assertEquals(ecbs.getColumns().size(), 1);
@@ -56,19 +52,21 @@ public class TestEncodedColumnBasedSet {
   }
 
   @Test
-  public void negative() throws IOException, JSONException {
+  public void testCompressionNoOp() throws IOException, JSONException {
     // put the wrong information in compressorInfo. EncodedColumnBasedSet
     // should send back the column uncompressed.
-    info.put("vendor", "org.apache.hive.service.cli");
-    info.put("compressorSet", "thisiswrong");
-    stringJSON.put("INT_TYPE", info);
-    hiveConf.set("CompressorInfo", stringJSON.toString());
-    ecbs = new EncodedColumnBasedSet(testTRowSet);
+    JSONObject temp = new JSONObject();
+    temp.put("vendor", "thisiswrong");
+    temp.put("compressorSet", "thisiswrong");
+    JSONObject compressorInfo = new JSONObject();
+    compressorInfo.put("INT_TYPE", temp);
+    hiveConf.set("CompressorInfo", compressorInfo.toString());
+    EncodedColumnBasedSet ecbs = new EncodedColumnBasedSet(testTRowSet);
     ecbs.setConf(hiveConf);
     TRowSet compressed = ecbs.toTRowSet();
     assertEquals(ecbs.getColumns().size(), 1);
     assertEquals(compressed.getEnColumnsSize(), 0);
-    Integer[] l = new Integer[] { 0, 1, 2 };
-    assertArrayEquals(compressed.getColumns().get(0).getI32Val().getValues().toArray(), l);
+    Integer[] ints = new Integer[] { 0, 1, 2 };
+    assertArrayEquals(compressed.getColumns().get(0).getI32Val().getValues().toArray(), ints);
   }
 }
