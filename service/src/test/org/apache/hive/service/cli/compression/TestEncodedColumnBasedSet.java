@@ -1,38 +1,46 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.hive.service.cli.compression;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-
-
-import org.apache.hive.service.cli.Column;
-import org.apache.hive.service.cli.Type;
-import org.apache.hive.service.cli.compression.EncodedColumnBasedSet;
-import org.apache.hive.service.cli.thrift.TRowSet;
-
-
-import org.apache.hadoop.hive.conf.HiveConf;
-
 
 import java.io.IOException;
 
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hive.service.cli.Column;
+import org.apache.hive.service.cli.Type;
+import org.apache.hive.service.cli.thrift.TRowSet;
+import org.json.JSONException;
+import org.json.JSONObject;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
 
-
-
-/*
- * To test functionality of EncodedColumnBasedSets. 
+/**
+ * To test functionality of EncodedColumnBasedSets.
  */
 public class TestEncodedColumnBasedSet {
 
   private TRowSet testTRowSet;
   private static HiveConf hiveConf = new HiveConf();
-  
+
   /**
-   * sets up the pre-requisite data variables. throws JSONException.
+   * sets up the prerequisite data variables. throws JSONException.
    */
   @Before
   public void setUp() throws JSONException {
@@ -43,7 +51,7 @@ public class TestEncodedColumnBasedSet {
     column.addValue(Type.INT_TYPE, 1);
     column.addValue(Type.INT_TYPE, 2);
     testTRowSet.addToColumns(column.toTColumn());
-   
+
     hiveConf.setBoolean("hive.resultset.compression.enabled", true);
     
   }
@@ -56,7 +64,7 @@ public class TestEncodedColumnBasedSet {
    */
   @Test
   public void testCompressionUsingSnappy() throws IOException, JSONException {
-    
+
     JSONObject temp = new JSONObject();
     temp.put("vendor", "snappy");
     temp.put("compressorSet", "snappy");
@@ -67,7 +75,7 @@ public class TestEncodedColumnBasedSet {
     ecbs.setConf(hiveConf);
     TRowSet compressed = ecbs.toTRowSet();
     byte[] compressedData = compressed.getEnColumns().get(0).getEnData();
-    assertArrayEquals(SnappyIntCompressor.decompress(compressedData), new int[] { 0, 1, 2 });
+    assertArrayEquals(SnappyIntCompressor.decompress(compressedData), new int[] {0, 1, 2});
   }
 
   /**
@@ -78,7 +86,7 @@ public class TestEncodedColumnBasedSet {
    */
   @Test
   public void testCompressionNoOp() throws IOException, JSONException {
-  
+
     JSONObject temp = new JSONObject();
     temp.put("vendor", "thisiswrong");
     temp.put("compressorSet", "thisiswrong");
@@ -90,7 +98,7 @@ public class TestEncodedColumnBasedSet {
     TRowSet compressed = ecbs.toTRowSet();
     assertEquals(ecbs.getColumns().size(), 1);
     assertEquals(compressed.getEnColumnsSize(), 0);
-    Integer[] ints = new Integer[] { 0, 1, 2 };
+    Integer[] ints = new Integer[] {0, 1, 2};
     assertArrayEquals(compressed.getColumns().get(0).getI32Val().getValues().toArray(), ints);
   }
 }

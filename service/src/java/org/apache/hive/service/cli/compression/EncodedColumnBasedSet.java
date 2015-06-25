@@ -1,10 +1,27 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.hive.service.cli.compression;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
-import org.apache.hive.service.cli.CLIService;
 import org.apache.hive.service.cli.Column;
 import org.apache.hive.service.cli.ColumnBasedSet;
 import org.apache.hive.service.cli.TableSchema;
@@ -22,34 +39,31 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-
-
-
-
-
+/**
+ * Class that can handle resultSets which are a mix of compressed and uncompressed columns To
+ * compress columns, it would need a JSON string a client would send(ThriftCLIService.java) The
+ * JSON string would have vendor, compressorSet and the entryClass (for a plugin) Using them,
+ * server would know which entry class to call. A All of these entry classes would have to
+ * implement the interface (ColumnCompressor.java) The compressorInfo is the JSON string in the
+ * form {"INT_TYPE": {"vendor": (name), "compressorSet":(name), "entryClass": (name)}, ...} If the
+ * client mentioned the wrong vendor or classname or compressorSet, or it does so correctly but
+ * the server does not have it, the column would not be compressed The client can find out which
+ * columns are/aren't compressed by looking at the compressorBitmap The column number that's
+ * compressed would have it's respective bit set and vice-versa
+ */
 public class EncodedColumnBasedSet extends ColumnBasedSet {
-  /**
-   * Class that can handle resultSets which are a mix of compressed and uncompressed columns To
-   * compress columns, it would need a JSON string a client would send(ThriftCLIService.java) The
-   * JSON string would have vendor, compressorSet and the entryClass (for a plugin) Using them,
-   * server would know which entry class to call. A All of these entry classes would have to
-   * implement the interface (ColumnCompressor.java) The compressorInfo is the JSON string in the
-   * form {"INT_TYPE": {"vendor": (name), "compressorSet":(name), "entryClass": (name)}, ...} If the
-   * client mentioned the wrong vendor or classname or compressorSet, or it does so correctly but
-   * the server does not have it, the column would not be compressed The client can find out which
-   * columns are/aren't compressed by looking at the compressorBitmap The column number that's
-   * compressed would have it's respective bit set and vice-versa
-   */
 
   private HiveConf hiveConf;
   
   private final Log LOG = LogFactory.getLog(EncodedColumnBasedSet.class.getName());
-  /*
+
+  /**
    * Compressors that shouldn't be used specified as csv under
    * "hive.resultset.compression.disabled.compressors".
    */
-  private HashSet<String> disabledCompressors = new HashSet<String>();
+  private Set<String> disabledCompressors = new HashSet<String>();
 
   public EncodedColumnBasedSet(TableSchema schema) {
     super(schema);
@@ -61,24 +75,6 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
 
   public EncodedColumnBasedSet(Type[] types, List<Column> subset, long startOffset) {
     super(types, subset, startOffset);
-  }
-
-  /**
-   * Given an index, update the TRowSet with the column (uncompressed) and update the bitmap with
-   * that index set to false.
-   * 
-   * @param trowset
-   *          a given TRowSet
-   * @param index
-   *          index for the column which needs to be inserted into TColumns
-   * @param bitmap
-   *          bitmap that needs to be updated with info that column "i" is not compressed
-   * 
-   */
-
-  private void addUncompressedColumn(TRowSet trowset, int index, BitSet bitmap) {
-    trowset.addToColumns(columns.get(index).toTColumn());
-    bitmap.set(index, false);
   }
 
   /**
@@ -127,9 +123,27 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
   }
 
   /**
+   * Given an index, update the TRowSet with the column (uncompressed) and update the bitmap with
+   * that index set to false.
+   *
+   * @param trowset
+   *          a given TRowSet
+   * @param index
+   *          index for the column which needs to be inserted into TColumns
+   * @param bitmap
+   *          bitmap that needs to be updated with info that column "i" is not compressed
+   *
+   */
+
+  private void addUncompressedColumn(TRowSet trowset, int index, BitSet bitmap) {
+    trowset.addToColumns(columns.get(index).toTColumn());
+    bitmap.set(index, false);
+  }
+
+  /**
    * Add the column at specified index to the row set; compress it before adding if the JSON
    * configuration is valid.
-   * 
+   *
    * @param trowset
    *          Row set to add the column to
    * @param index
@@ -153,7 +167,7 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
       return;
     }
     String compressorKey = vendor + "." + compressorSet;
-    if (disabledCompressors.contains(compressorKey) == true) {
+    if (disabledCompressors.contains(compressorKey)) {
       addUncompressedColumn(trowset, index, compressorBitmap);
       return;
     }
@@ -202,14 +216,14 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
 
   /**
    * Pass the Hive session configuration containing client compressor configurations to this object.
-   * 
+   *
    * @param conf
    *          Current Hive session configuration to set
    */
   public void setConf(HiveConf conf) {
     this.hiveConf = conf;
-    String[] disabledCompressors = this.hiveConf.getVar(
+    String[] disabled = this.hiveConf.getVar(
         ConfVars.HIVE_RESULTSET_COMPRESSION_DISABLED_COMPRESSORS).split(",");
-    this.disabledCompressors.addAll(Arrays.asList(disabledCompressors));
+    this.disabledCompressors.addAll(Arrays.asList(disabled));
   }
 }
