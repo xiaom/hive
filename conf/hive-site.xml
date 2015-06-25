@@ -18,15 +18,5 @@
 -->
 
 <configuration>
-  <property>
-    <name>hive.resultset.compression.disabled.compressors</name>
-    <value></value>
-    <description>
-      ResultSet compression sets that shouldn't be used for any reason, should be mentioned here as comma separated values.
-    </description>
-  </property>
-  <property>
-    <name>hive.resultset.compression.enabled</name>
-    <value>true</value>
-  </property>
+
 </configuration>
