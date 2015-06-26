@@ -42,21 +42,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Class that can handle resultSets which are a mix of compressed and uncompressed columns To
- * compress columns, it would need a JSON string a client would send(ThriftCLIService.java) The
- * JSON string would have vendor, compressorSet and the entryClass (for a plugin) Using them,
- * server would know which entry class to call. A All of these entry classes would have to
- * implement the interface (ColumnCompressor.java) The compressorInfo is the JSON string in the
- * form {"INT_TYPE": {"vendor": (name), "compressorSet":(name), "entryClass": (name)}, ...} If the
- * client mentioned the wrong vendor or classname or compressorSet, or it does so correctly but
- * the server does not have it, the column would not be compressed The client can find out which
- * columns are/aren't compressed by looking at the compressorBitmap The column number that's
- * compressed would have it's respective bit set and vice-versa
+ * Column based set that compresses the columnar result set, with the compression plugin specified
+ * by client preferences, if such a plugin exits.
+ *
+ * The client specifies a compression plugin by passing a JSON string of the format {"INT_TYPE":
+ * {"vendor": <vendor name>, "compressorSet":<compressor set name>}, ...} with the key
+ * "CompressorInfo" as a client configuration. Hive server then looks up the class that
+ * implements ColumnCompressor with the specified vendor and compressorSet strings. If such a class
+ * is found, it is used to compress columnar result set. If not, uncompressed column result set
+ * will be returned. The client can find out which columns are/aren't compressed by looking at the
+ * compressorBitmap field. The column that's compressed would have its corresponding bit set
+ * and vice-versa.
+ * 
  */
 public class EncodedColumnBasedSet extends ColumnBasedSet {
 
   private HiveConf hiveConf;
-  
+
   private final Log LOG = LogFactory.getLog(EncodedColumnBasedSet.class.getName());
 
   /**
@@ -78,8 +80,9 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
   }
 
   /**
-   * Main function that converts the columns in the RowSet if the compressorInfo points to a valid
-   * class and the compressor is not part of the disable compressorList (referred to above).
+   * Main function that compresses the columns in the RowSet if the compressorInfo points to a
+   * valid class and the compressor is not part of the disable compressorList (referred to
+   * above).
    *
    */
   @Override
@@ -88,8 +91,8 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
     if (hiveConf == null) {
       throw new IllegalStateException("Hive configuration from session not set");
     }
-    TRowSet trowset = new TRowSet(getStartOffset(), new ArrayList<TRow>());
-    trowset.setColumns(new ArrayList<TColumn>());
+    TRowSet tRowSet = new TRowSet(getStartOffset(), new ArrayList<TRow>());
+    tRowSet.setColumns(new ArrayList<TColumn>());
     // A bitmap showing whether each column is compressed or not
     BitSet compressorBitmap = new BitSet();
     // Get the JSON string specifying client compressor preferences
@@ -97,29 +100,29 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
     if (!hiveConf.getBoolVar(ConfVars.HIVE_RESULTSET_COMPRESSION_ENABLED) 
         || compressorInfo == null) {
       for (int i = 0; i < columns.size(); i++) {
-        addUncompressedColumn(trowset, i, compressorBitmap);
+        addUncompressedColumn(tRowSet, i, compressorBitmap);
       }
     } else {
-      JSONObject compressorInfojson = null;
+      JSONObject compressorInfoJson = null;
       try {
-        compressorInfojson = new JSONObject(compressorInfo);
+        compressorInfoJson = new JSONObject(compressorInfo);
       } catch (JSONException e) {
         LOG.info("JSON string malformed " + e.toString());
       }
-      if (compressorInfojson != null) {
+      if (compressorInfoJson != null) {
         for (int i = 0; i < columns.size(); i++) {
           // Add this column, possibly compressed, to the row set.
-          addColumn(trowset, i, compressorInfojson, compressorBitmap);
+          addColumn(tRowSet, i, compressorInfoJson, compressorBitmap);
         }
       } else {
         for (int i = 0; i < columns.size(); i++) {
-          addUncompressedColumn(trowset, i, compressorBitmap);
+          addUncompressedColumn(tRowSet, i, compressorBitmap);
         }
       }
     }
     ByteBuffer bitmap = ByteBuffer.wrap(compressorBitmap.toByteArray());
-    trowset.setCompressorBitmap(bitmap);
-    return trowset;
+    tRowSet.setCompressorBitmap(bitmap);
+    return tRowSet;
   }
 
   /**
@@ -144,7 +147,7 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
    * Add the column at specified index to the row set; compress it before adding if the JSON
    * configuration is valid.
    *
-   * @param trowset
+   * @param tRowSet
    *          Row set to add the column to
    * @param index
    *          Index of the column of add to the row set
@@ -153,22 +156,22 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
    * @param compressorBitmap
    *          The bitmap to be set to show whether the column is compressed or not
    */
-  private void addColumn(TRowSet trowset, int index, JSONObject compressorInfoJson,
+  private void addColumn(TRowSet tRowSet, int index, JSONObject compressorInfoJson,
       BitSet compressorBitmap) {
     String vendor = "";
     String compressorSet = "";
     try {
-      JSONObject jsonObject = compressorInfoJson.getJSONObject(columns.get(index).getType().
-          toString());
+      JSONObject jsonObject = compressorInfoJson.getJSONObject(columns.get(index).getType()
+          .toString());
       vendor = jsonObject.getString("vendor");
       compressorSet = jsonObject.getString("compressorSet");
     } catch (JSONException e) {
-      addUncompressedColumn(trowset, index, compressorBitmap);
+      addUncompressedColumn(tRowSet, index, compressorBitmap);
       return;
     }
     String compressorKey = vendor + "." + compressorSet;
     if (disabledCompressors.contains(compressorKey)) {
-      addUncompressedColumn(trowset, index, compressorBitmap);
+      addUncompressedColumn(tRowSet, index, compressorBitmap);
       return;
     }
     ColumnCompressor columnCompressorImpl = null;
@@ -177,28 +180,29 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
     columnCompressorImpl = ColumnCompressorService.getInstance().getCompressor(vendor,
         compressorSet);
     if (columnCompressorImpl == null) {
-      addUncompressedColumn(trowset, index, compressorBitmap);
+      addUncompressedColumn(tRowSet, index, compressorBitmap);
       return;
     }
-    // The compressor may not be able to compress the column because the type is not supported, etc.
+    // The compressor may not be able to compress the column because the type is not supported,
+    // etc.
     if (!columnCompressorImpl.isCompressible(columns.get(index))) {
-      addUncompressedColumn(trowset, index, compressorBitmap);
+      addUncompressedColumn(tRowSet, index, compressorBitmap);
       return;
     }
     // Create the TEnColumn that will be carrying the compressed column data
-    TEnColumn tencolumn = new TEnColumn();
+    TEnColumn tEnColumn = new TEnColumn();
     int colSize = columns.get(index).size();
-    tencolumn.setSize(colSize);
-    tencolumn.setType(columns.get(index).getType().toTType());
-    tencolumn.setNulls(columns.get(index).getNulls());
-    tencolumn.setCompressorName(compressorSet);
+    tEnColumn.setSize(colSize);
+    tEnColumn.setType(columns.get(index).getType().toTType());
+    tEnColumn.setNulls(columns.get(index).getNulls());
+    tEnColumn.setCompressorName(compressorSet);
     compressorBitmap.set(index, true);
     if (colSize == 0) {
-      tencolumn.setEnData(new byte[0]);
+      tEnColumn.setEnData(new byte[0]);
     } else {
-      tencolumn.setEnData(columnCompressorImpl.compress(columns.get(index)));
+      tEnColumn.setEnData(columnCompressorImpl.compress(columns.get(index)));
     }
-    trowset.addToEnColumns(tencolumn);
+    tRowSet.addToEnColumns(tEnColumn);
   }
 
   @Override
@@ -215,7 +219,7 @@ public class EncodedColumnBasedSet extends ColumnBasedSet {
   }
 
   /**
-   * Pass the Hive session configuration containing client compressor configurations to this object.
+   * Pass the Hive session configuration containing client compressor preferences to this object.
    *
    * @param conf
    *          Current Hive session configuration to set
